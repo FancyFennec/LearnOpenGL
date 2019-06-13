@@ -18,13 +18,10 @@ public:
 	void processInput(float deltaTime);
 	void swapBuffers() { glfwSwapBuffers(window); }
 
-	void setCamera(Camera camera) { this->camera = camera;  }
+	//void setCamera(Camera camera) { this->camera = camera;  }
+	Camera getCamera() { return camera; }
 	bool getShouldClose() { return glfwWindowShouldClose(window); }
 	GLFWwindow* getWindow() { return window;  }
-
-	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 private:
 	GLFWwindow* window;
@@ -33,10 +30,16 @@ private:
 	unsigned int SCR_HEIGHT;
 
 	static bool firstMouse;
+	static bool cursorEnabled;
 
 	static float lastX;
 	static float lastY;
 
 	static Camera camera;
+
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 

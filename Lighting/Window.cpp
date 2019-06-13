@@ -2,6 +2,7 @@
 
 Camera Window::camera;
 bool Window::firstMouse = true;
+bool Window::cursorEnabled = false;
 float Window::lastX = 0.0f;
 float Window::lastY = 0.0f;
 
@@ -58,6 +59,7 @@ int Window::initialise()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSwapInterval(1); // Enable vsync
@@ -113,10 +115,32 @@ void Window::mouse_callback(GLFWwindow * window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	if (!cursorEnabled) {
+		camera.ProcessMouseMovement(xoffset, yoffset);
+	}
 }
 
 void Window::scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
+}
+
+void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_SPACE) {
+		switch (action) {
+		case GLFW_RELEASE:
+			if (!cursorEnabled) {
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				cursorEnabled = true;
+			}
+			else {
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				cursorEnabled = false;
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }
