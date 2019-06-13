@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Camera.h"
@@ -8,14 +9,17 @@ class Window
 {
 public:
 	Window();
+	Window(Camera camera);
 	Window(unsigned int width,unsigned int height);
+	Window(Camera camera, unsigned int width, unsigned int height);
 	~Window();
 
 	int initialise();
 	void processInput(float deltaTime);
-
-	bool getShouldClose() { return glfwWindowShouldClose(window); }
 	void swapBuffers() { glfwSwapBuffers(window); }
+
+	void setCamera(Camera camera) { this->camera = camera;  }
+	bool getShouldClose() { return glfwWindowShouldClose(window); }
 	GLFWwindow* getWindow() { return window;  }
 
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
