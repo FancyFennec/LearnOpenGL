@@ -1,9 +1,10 @@
-#pragma once
+#ifndef WINDOW_H
+#define WINDOW_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
 #include "Camera.h"
+#include <GLFW/glfw3.h>
+
+#include <iostream>
 
 class Window
 {
@@ -26,8 +27,8 @@ public:
 private:
 	GLFWwindow* window;
 
-	unsigned int SCR_WIDTH;
-	unsigned int SCR_HEIGHT;
+	unsigned int WIDTH;
+	unsigned int HEIGHT;
 
 	static bool firstMouse;
 	static bool cursorEnabled;
@@ -43,3 +44,4 @@ private:
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
+#endif

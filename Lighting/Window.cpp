@@ -8,28 +8,28 @@ float Window::lastY = 0.0f;
 
 Window::Window()
 {
-	SCR_WIDTH = 800;
-	SCR_HEIGHT = 600;
+	WIDTH = 800;
+	HEIGHT = 600;
 }
 
 Window::Window(Camera camera)
 {
-	SCR_WIDTH = 800;
-	SCR_HEIGHT = 600;
+	WIDTH = 800;
+	HEIGHT = 600;
 
 	this->camera = camera;
 }
 
 Window::Window(unsigned int width, unsigned int height)
 {
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
+	WIDTH = width;
+	HEIGHT = height;
 }
 
 Window::Window(Camera camera, unsigned int width, unsigned int height)
 {
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
+	WIDTH = width;
+	HEIGHT = height;
 
 	this->camera = camera;
 }
@@ -49,7 +49,7 @@ int Window::initialise()
 
 	// glfw window creation
 	// --------------------
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
 
 	if (window == NULL)
 	{

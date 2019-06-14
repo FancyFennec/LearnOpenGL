@@ -2,16 +2,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Constants.h"
 #include "Shader.h"
 #include "stb_image.h"
 #include "Window.h"
+#include "Mesh.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
 #include "Imgui/imgui_impl_opengl3.h"
 
 unsigned int loadTexture(char const * path);
-unsigned int SCR_WIDTH = 1400, SCR_HEIGHT = 1000;
+void updateDeltaTime();
 
 // camera
 Window window(Camera(glm::vec3(0.0f, 0.0f, 3.0f)), SCR_WIDTH, SCR_HEIGHT);
@@ -67,13 +69,12 @@ int main()
 	 // set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 	float vertices[] = {
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+		// positions          // texture   // normals 
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
 
 		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
@@ -163,15 +164,12 @@ int main()
 	lightingShader.setInt("material.diffuse", 0);
 	lightingShader.setInt("material.specular", 1);
 
-	bool show_demo_window = true;
-	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	// render loop
    // -----------
 	while (!window.getShouldClose())
 	{
-
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -179,14 +177,12 @@ int main()
 
 		// per-frame time logic
 		// --------------------
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		updateDeltaTime();
 
 
 		// input
 		// -----
-		window.processInput(deltaTime);
+		window.processInput(deltaTime); //TODO:Mybe we can solve this different, such that we don't have to put in delta time here
 
 		// render
 		// ------
@@ -196,7 +192,7 @@ int main()
 		// be sure to activate shader when setting uniforms/drawing objects
 
 		glm::mat4 lsmodel = glm::mat4(1.0f);
-		lsmodel = glm::rotate(lsmodel, currentFrame, glm::vec3(0, 1, 0));
+		lsmodel = glm::rotate(lsmodel, (float) glfwGetTime(), glm::vec3(0, 1, 0));
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
@@ -207,10 +203,13 @@ int main()
 		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		lightingShader.setFloat("material.shininess", 32.0f);
 
+		static float a = 0.0f;
+		static float d = 0.0f;
+		static float s = 0.0f;
 		// light properties
-		lightingShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f); // note that all light colors are set at full intensity
-		lightingShader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("light.ambient", a, a, a); // note that all light colors are set at full intensity
+		lightingShader.setVec3("light.diffuse", d, d, d);
+		lightingShader.setVec3("light.specular", s, s, s);
 		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", window.getCamera().Position);
 
@@ -242,6 +241,7 @@ int main()
 
 		// also draw the lamp object
 		lampShader.use();
+
 		lampShader.setMat4("projection", projection);
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("model", lsmodel);
@@ -252,10 +252,11 @@ int main()
 
 		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
-			static float f = 0.0f;
-
+			
 			ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
-			ImGui::SliderFloat("Slider", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
+			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 			ImGui::End();
 		}
 
@@ -281,6 +282,13 @@ int main()
 
 	window.~Window();
 	return 0;
+}
+
+void updateDeltaTime()
+{
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
 }
 
 // utility function for loading a 2D texture from file
