@@ -26,10 +26,6 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 const char* glsl_version = "#version 130";
 
-//TODO: This is not needed at the moment
-void calcAverageNormals(unsigned int * indices, unsigned int indCount, float * vertices, unsigned int vertCount,
-	unsigned int rowLength, unsigned int normalOffset);
-
 int main()
 {
 	window.initialise();
@@ -133,18 +129,6 @@ int main()
 	Mesh cubeMesh(36);
 	cubeMesh.CreateMesh(vertices);
 
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	unsigned int lightVAO, lightVBO;
-	glGenBuffers(1, &lightVAO);
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-
-	glGenBuffers(1, &lightVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 	unsigned int diffuseMap = loadTexture("../Resources/container2.png");
 	unsigned int specularMap = loadTexture("../Resources/container2_specular.png");
 
@@ -235,8 +219,7 @@ int main()
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("model", lsmodel);
 
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		cubeMesh.RenderMesh();
 
 
 		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
@@ -255,11 +238,6 @@ int main()
 		window.swapBuffers();
 		glfwPollEvents();
 	}
-
-	// optional: de-allocate all resources once they've outlived their purpose:
-	// ------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &lightVAO);
-	glDeleteBuffers(1, &lightVBO);
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -317,33 +295,4 @@ unsigned int loadTexture(char const * path)
 	}
 
 	return textureID;
-}
-
-void calcAverageNormals(unsigned int * indices, unsigned int indCount, float * vertices, unsigned int vertCount,
-	unsigned int rowLength, unsigned int normalOffset)
-{
-	for (size_t i = 0; i < indCount; i += 3)
-	{
-		unsigned int in0 = indices[i] * rowLength;
-		unsigned int in1 = indices[i + 1] * rowLength;
-		unsigned int in2 = indices[i + 2] * rowLength;
-
-		glm::vec3 v1(vertices[in1] - vertices[in0], vertices[in1 + 1] - vertices[in0 + 1], vertices[in1 + 2] - vertices[in0 + 2]);
-		glm::vec3 v2(vertices[in2] - vertices[in0], vertices[in2 + 1] - vertices[in0 + 1], vertices[in2 + 2] - vertices[in0 + 2]);
-		glm::vec3 normal = glm::cross(v1, v2);
-		normal = glm::normalize(normal);
-
-		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
-		vertices[in0] += normal.x; vertices[in0 + 1] += normal.y; vertices[in0 + 2] += normal.z;
-		vertices[in1] += normal.x; vertices[in1 + 1] += normal.y; vertices[in1 + 2] += normal.z;
-		vertices[in2] += normal.x; vertices[in2 + 1] += normal.y; vertices[in2 + 2] += normal.z;
-	}
-
-	for (size_t i = 0; i < vertCount / rowLength; i++)
-	{
-		unsigned int nOffset = i * rowLength + normalOffset;
-		glm::vec3 vec(vertices[nOffset], vertices[nOffset + 1], vertices[nOffset + 2]);
-		vec = glm::normalize(vec);
-		vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
-	}
 }
