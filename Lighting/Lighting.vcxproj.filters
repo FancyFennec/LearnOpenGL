@@ -96,11 +96,5 @@
   <ItemGroup>
     <None Include="lampShader.vs" />
     <None Include="lampShader.fs" />
-    <None Include="colorShader.fs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="colorShader.vs">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

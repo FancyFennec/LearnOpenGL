@@ -26,6 +26,10 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 const char* glsl_version = "#version 130";
 
+//TODO: This is not needed at the moment
+void calcAverageNormals(unsigned int * indices, unsigned int indCount, float * vertices, unsigned int vertCount,
+	unsigned int rowLength, unsigned int normalOffset);
+
 int main()
 {
 	window.initialise();
@@ -63,43 +67,54 @@ int main()
 
 	// build and compile our shader program
 	// ------------------------------------
-	Shader lightingShader("colorShader.vs", "colorShader.fs");
-	Shader lampShader("lampShader.vs", "lampShader.fs");
+	Shader lightingShader("Shaders/colorShader.vs", "Shaders/colorShader.fs");
+	Shader lampShader("Shaders/lampShader.vs", "Shaders/lampShader.fs");
 
 	 // set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 	float vertices[] = {
-		// back positions     // texture   // normals 
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f,  0.0f,
-		
-		// front positions     // texture   // normals 
-		-0.5f, -0.5f,  0.5f,   0.0f, 0.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,   1.0f, 0.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,   0.0f, 1.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,   1.0f, 1.0f,  0.0f,  0.0f,  0.0f,
-	};
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-	float indices[] = {
-		1 ,2 ,3, //back
-		2, 3, 4,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-		5, 6, 7, //front
-		6, 7, 8,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		4, 6, 8, //right
-		2, 4, 8,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		3, 5, 7, //left
-		1, 3, 5,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-		3, 4, 7, //top
-		8, 7, 4,
-
-		1, 2, 5, //bottom
-		5, 6, 2
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
 	glm::vec3 cubePositions[] = {
@@ -115,15 +130,17 @@ int main()
   glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 	
-	Mesh cubeMesh;
-	cubeMesh.createMesh(vertices, indices, 8, 12);
+	Mesh cubeMesh(36);
+	cubeMesh.CreateMesh(vertices);
 
 	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	unsigned int lightVAO, VBO;
+	unsigned int lightVAO, lightVBO;
+	glGenBuffers(1, &lightVAO);
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &lightVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
 	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -208,7 +225,7 @@ int main()
 			lightingShader.setMat4("model", model);
 
 			// render the cube
-			cubeMesh.renderMesh();
+			cubeMesh.RenderMesh();
 		}
 
 		// also draw the lamp object
@@ -242,7 +259,7 @@ int main()
 	// optional: de-allocate all resources once they've outlived their purpose:
 	// ------------------------------------------------------------------------
 	glDeleteVertexArrays(1, &lightVAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &lightVBO);
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -300,4 +317,33 @@ unsigned int loadTexture(char const * path)
 	}
 
 	return textureID;
+}
+
+void calcAverageNormals(unsigned int * indices, unsigned int indCount, float * vertices, unsigned int vertCount,
+	unsigned int rowLength, unsigned int normalOffset)
+{
+	for (size_t i = 0; i < indCount; i += 3)
+	{
+		unsigned int in0 = indices[i] * rowLength;
+		unsigned int in1 = indices[i + 1] * rowLength;
+		unsigned int in2 = indices[i + 2] * rowLength;
+
+		glm::vec3 v1(vertices[in1] - vertices[in0], vertices[in1 + 1] - vertices[in0 + 1], vertices[in1 + 2] - vertices[in0 + 2]);
+		glm::vec3 v2(vertices[in2] - vertices[in0], vertices[in2 + 1] - vertices[in0 + 1], vertices[in2 + 2] - vertices[in0 + 2]);
+		glm::vec3 normal = glm::cross(v1, v2);
+		normal = glm::normalize(normal);
+
+		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
+		vertices[in0] += normal.x; vertices[in0 + 1] += normal.y; vertices[in0 + 2] += normal.z;
+		vertices[in1] += normal.x; vertices[in1 + 1] += normal.y; vertices[in1 + 2] += normal.z;
+		vertices[in2] += normal.x; vertices[in2 + 1] += normal.y; vertices[in2 + 2] += normal.z;
+	}
+
+	for (size_t i = 0; i < vertCount / rowLength; i++)
+	{
+		unsigned int nOffset = i * rowLength + normalOffset;
+		glm::vec3 vec(vertices[nOffset], vertices[nOffset + 1], vertices[nOffset + 2]);
+		vec = glm::normalize(vec);
+		vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
+	}
 }

@@ -174,8 +174,6 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="colorShader.fs" />
-    <None Include="colorShader.vs" />
     <None Include="lampShader.fs" />
     <None Include="lampShader.vs" />
   </ItemGroup>

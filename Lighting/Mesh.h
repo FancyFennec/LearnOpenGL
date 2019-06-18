@@ -6,16 +6,17 @@
 class Mesh
 {
 public:
-	Mesh();
+	Mesh(unsigned int numOfVertices);
+
+	void CreateMesh(float *vertices);
+	void RenderMesh();
+	void ClearMesh();
+
 	~Mesh();
 
-	void createMesh(float* vertices, float* indices, unsigned int numOfVertices, unsigned int numOfIndices);
-	void renderMesh();
-	void clearMesh();
-
 private:
-	unsigned int VAO, VBO, IBO;
-	unsigned indexCount;
+	unsigned int VAO, VBO;
+	unsigned int numOfVertices;
 };
 
 #endif
