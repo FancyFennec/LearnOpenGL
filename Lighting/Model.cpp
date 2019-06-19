@@ -16,9 +16,10 @@ void Model::loadTextures(const char * diffuse, const char * specular)
 {
 	diffuseMap = loadTexture("../Resources/container2.png");
 	specularMap = loadTexture("../Resources/container2_specular.png");
+	shader.use();
 }
 
-unsigned int loadTexture(char const * path)
+unsigned int Model::loadTexture(char const * path)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
