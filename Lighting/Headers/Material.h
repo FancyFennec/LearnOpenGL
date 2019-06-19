@@ -16,7 +16,6 @@ public:
 	void setDiffuse(glm::vec3 diffuse) { this->diffuse = diffuse; };
 	void setSpecular(glm::vec3 specular) { this->specular = specular; };
 
-private:
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;

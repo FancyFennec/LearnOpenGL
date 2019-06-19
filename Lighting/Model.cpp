@@ -2,7 +2,10 @@
 
 
 
-Model::Model(Mesh mesh, Shader shader) : shader(shader)
+Model::Model(Mesh mesh, Shader shader, Material material) : 
+	shader(shader),
+	mesh(mesh),
+	material(material)
 {
 	shader.use();
 }
@@ -54,4 +57,12 @@ unsigned int Model::loadTexture(char const * path)
 	}
 
 	return textureID;
+}
+
+void Model::renderModel()
+{
+	shader.setVec3("material.ambient", material.ambient);
+	shader.setVec3("material.diffuse", material.diffuse);
+	shader.setVec3("material.specular", material.specular);
+	shader.setFloat("material.shininess", material.shininess);
 }
