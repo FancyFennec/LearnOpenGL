@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
 #include <glm/glm.hpp>
 
@@ -6,6 +7,7 @@ class Material
 {
 public:
 	Material();
+	Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess);
 	~Material();
 
 	void setAmbient(float ambient) { this->ambient = glm::vec3(ambient); };
@@ -22,17 +24,4 @@ public:
 	float shininess;
 };
 
-
-
-Material::Material()
-{
-	ambient = glm::vec3(0);
-	diffuse = glm::vec3(0);
-	specular = glm::vec3(0);
-	shininess = 0.f;
-}
-
-
-Material::~Material()
-{
-}
+#endif

@@ -1,7 +1,5 @@
 #include "Headers/Model.h"
 
-
-
 Model::Model(Mesh mesh, Shader* shader, Material material) : 
 	shader(shader),
 	mesh(mesh),
@@ -13,14 +11,15 @@ Model::Model(Mesh mesh, Shader* shader, Material material) :
 
 Model::~Model()
 {
-	delete shader;
 }
 
 void Model::loadTextures(const char * diffuse, const char * specular)
 {
-	diffuseMap = loadTexture("../Resources/container2.png");
-	specularMap = loadTexture("../Resources/container2_specular.png");
+	diffuseMap = loadTexture(diffuse);
+	specularMap = loadTexture(specular);
 	shader->use();
+	shader->setInt("material.diffuse", 0);
+	shader->setInt("material.specular", 1);
 }
 
 unsigned int Model::loadTexture(char const * path)
@@ -60,8 +59,19 @@ unsigned int Model::loadTexture(char const * path)
 	return textureID;
 }
 
-void Model::renderModel()
+void Model::bindMaps()
 {
+	// bind diffuse map
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specularMap);
+}
+
+void Model::updateShader()
+{
+	shader->use();
 	shader->setVec3("material.ambient", material.ambient);
 	shader->setVec3("material.diffuse", material.diffuse);
 	shader->setVec3("material.specular", material.specular);

@@ -1,9 +1,11 @@
-#pragma once
+#ifndef MODEL_H
+#define MODEL_H
 
 #include "Mesh.h"
+#include "Material.h"
 #include "Shader.h"
 #include "stb_image.h"
-#include "Material.h"
+
 
 
 class Model
@@ -15,15 +17,17 @@ public:
 	void loadTextures(const char* diffuse, const char* specular);
 	unsigned int loadTexture(char const * path);
 
-	void renderModel();
+	void bindMaps();
+	void renderModel() { mesh.RenderMesh(); };
+	void updateShader();
 
-private:
 	Mesh mesh;
 	Shader* shader;
-
 	Material material;
 
+private:
 	unsigned int diffuseMap;
 	unsigned int specularMap;
 };
 
+#endif

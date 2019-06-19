@@ -3,16 +3,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Headers/Constants.h"
-#include "Headers/Shader.h"
-#include "Headers/stb_image.h"
 #include "Headers/Window.h"
-#include "Headers/Mesh.h"
+#include "Headers/Model.h"
+#include "Headers/Light.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
 #include "Imgui/imgui_impl_opengl3.h"
 
-unsigned int loadTexture(char const * path);
 void updateDeltaTime();
 
 // camera
@@ -129,8 +127,19 @@ int main()
 	Mesh cubeMesh;
 	cubeMesh.CreateMesh(vertices, 36);
 
-	unsigned int diffuseMap = loadTexture("../Resources/container2.png");
-	unsigned int specularMap = loadTexture("../Resources/container2_specular.png");
+	Model lampModel(cubeMesh, &lampShader, Material());
+	Model cubeModel(
+		cubeMesh, 
+		&lightingShader, 
+		Material(
+			glm::vec3(0.0f, 0.1f, 0.06f), 
+			glm::vec3(0.0f, 0.51f, 0.51f),
+			glm::vec3(0.5f, 0.5f, 0.5f), 
+			32.0f));
+
+	cubeModel.loadTextures("../Resources/container2.png", "../Resources/container2_specular.png");
+	
+	Light light(&lightingShader);
 
 	// shader configuration
 	// --------------------
@@ -168,57 +177,47 @@ int main()
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
-		lightingShader.use();
-
-		lightingShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
-		lightingShader.setVec3("material.diffuse", 0.0f, 0.51f, 0.51f);
-		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		lightingShader.setFloat("material.shininess", 32.0f);
-
+		cubeModel.updateShader();
+		
 		static float a = 0.0f;
 		static float d = 0.0f;
 		static float s = 0.0f;
 		// light properties
-		lightingShader.setVec3("light.ambient", a, a, a); // note that all light colors are set at full intensity
-		lightingShader.setVec3("light.diffuse", d, d, d);
-		lightingShader.setVec3("light.specular", s, s, s);
-		lightingShader.setVec3("light.position", lightPos);
-		lightingShader.setVec3("viewPos", window.getCamera().Position);
+
+		light.setAmbient(glm::vec3(a));
+		light.setDiffuse(glm::vec3(d));
+		light.setSpecular(glm::vec3(s));
+		light.setPosition(lightPos);
+		light.updateShader(window.getCamera().Position);
 
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = window.getCamera().GetViewMatrix();
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
-		lightingShader.setMat4("lsmodel", lsmodel);
+		cubeModel.shader->setMat4("projection", projection);
+		cubeModel.shader->setMat4("view", view);
+		cubeModel.shader->setMat4("lsmodel", lsmodel);
 
-		// bind diffuse map
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-		// bind specular map
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
+		cubeModel.bindMaps();
 
 		// world transformation
 		glm::mat4 model = glm::mat4(1.0f);
 		for (glm::vec3 vec : cubePositions) {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, vec);
-			lightingShader.setMat4("model", model);
-
+			cubeModel.shader->setMat4("model", model);
+			
 			// render the cube
-			cubeMesh.RenderMesh();
+			cubeModel.renderModel();
 		}
 
 		// also draw the lamp object
-		lampShader.use();
+		lampModel.shader->use();
 
-		lampShader.setMat4("projection", projection);
-		lampShader.setMat4("view", view);
-		lampShader.setMat4("model", lsmodel);
+		lampModel.shader->setMat4("projection", projection);
+		lampModel.shader->setMat4("view", view);
+		lampModel.shader->setMat4("model", lsmodel);
 
-		cubeMesh.RenderMesh();
-
+		lampModel.renderModel();
 
 		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
@@ -254,43 +253,4 @@ void updateDeltaTime()
 	float currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-}
-
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int loadTexture(char const * path)
-{
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data)
-	{
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-	}
-	else
-	{
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
 }
