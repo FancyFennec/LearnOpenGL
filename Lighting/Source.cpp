@@ -2,11 +2,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Constants.h"
-#include "Shader.h"
-#include "stb_image.h"
-#include "Window.h"
-#include "Mesh.h"
+#include "Headers/Constants.h"
+#include "Headers/Shader.h"
+#include "Headers/stb_image.h"
+#include "Headers/Window.h"
+#include "Headers/Mesh.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -126,8 +126,8 @@ int main()
   glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 	
-	Mesh cubeMesh(36);
-	cubeMesh.CreateMesh(vertices);
+	Mesh cubeMesh;
+	cubeMesh.CreateMesh(vertices, 36);
 
 	unsigned int diffuseMap = loadTexture("../Resources/container2.png");
 	unsigned int specularMap = loadTexture("../Resources/container2_specular.png");
@@ -135,8 +135,6 @@ int main()
 	// shader configuration
 	// --------------------
 	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
-	lightingShader.setInt("material.specular", 1);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 

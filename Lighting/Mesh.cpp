@@ -1,14 +1,14 @@
-#include "Mesh.h"
+#include "Headers/Mesh.h"
 
-Mesh::Mesh(unsigned int numOfVertices) :
-	numOfVertices(numOfVertices)
+Mesh::Mesh() 
 {
 	VAO = 0;
 	VBO = 0;
 }
 
-void Mesh::CreateMesh(float *vertices)
+void Mesh::CreateMesh(float *vertices, unsigned int numOfVertices)
 {
+	this->numOfVertices = numOfVertices;
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);

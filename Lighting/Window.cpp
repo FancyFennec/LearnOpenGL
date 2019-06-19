@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Headers/Window.h"
 
 Camera Window::camera;
 bool Window::firstMouse = true;
