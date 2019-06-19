@@ -2,24 +2,25 @@
 
 
 
-Model::Model(Mesh mesh, Shader shader, Material material) : 
+Model::Model(Mesh mesh, Shader* shader, Material material) : 
 	shader(shader),
 	mesh(mesh),
 	material(material)
 {
-	shader.use();
+	shader->use();
 }
 
 
 Model::~Model()
 {
+	delete shader;
 }
 
 void Model::loadTextures(const char * diffuse, const char * specular)
 {
 	diffuseMap = loadTexture("../Resources/container2.png");
 	specularMap = loadTexture("../Resources/container2_specular.png");
-	shader.use();
+	shader->use();
 }
 
 unsigned int Model::loadTexture(char const * path)
@@ -61,8 +62,8 @@ unsigned int Model::loadTexture(char const * path)
 
 void Model::renderModel()
 {
-	shader.setVec3("material.ambient", material.ambient);
-	shader.setVec3("material.diffuse", material.diffuse);
-	shader.setVec3("material.specular", material.specular);
-	shader.setFloat("material.shininess", material.shininess);
+	shader->setVec3("material.ambient", material.ambient);
+	shader->setVec3("material.diffuse", material.diffuse);
+	shader->setVec3("material.specular", material.specular);
+	shader->setFloat("material.shininess", material.shininess);
 }

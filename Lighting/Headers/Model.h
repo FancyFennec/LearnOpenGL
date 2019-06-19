@@ -9,7 +9,7 @@
 class Model
 {
 public:
-	Model(Mesh mesh, Shader shader, Material material);
+	Model(Mesh mesh, Shader* shader, Material material);
 	~Model();
 
 	void loadTextures(const char* diffuse, const char* specular);
@@ -19,7 +19,7 @@ public:
 
 private:
 	Mesh mesh;
-	Shader shader;
+	Shader* shader;
 
 	Material material;
 

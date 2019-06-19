@@ -1,11 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Shader.h"
 
 class Light
 {
 public:
-	Light();
+	Light(Shader* shader);
 	~Light();
 
 	void setAmbient(float ambient) { this->ambient = glm::vec3(ambient); };
@@ -17,16 +18,17 @@ public:
 	void setSpecular(glm::vec3 specular) { this->specular = specular; };
 	void setSpecular(glm::vec3 position) { this->position = position; };
 
-private:
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 	glm::vec3 position;
+
+	Shader* shader;
 };
 
 
 
-Light::Light()
+Light::Light(Shader* shader) : shader(shader)
 {
 	ambient = glm::vec3(0);
 	diffuse = glm::vec3(0);
@@ -36,4 +38,5 @@ Light::Light()
 
 Light::~Light()
 {
+	delete shader;
 }
