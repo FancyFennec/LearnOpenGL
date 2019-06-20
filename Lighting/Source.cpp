@@ -127,9 +127,9 @@ int main()
 	Mesh cubeMesh;
 	cubeMesh.CreateMesh(vertices, 36);
 
-	Model lampModel(cubeMesh, &lampShader, Material());
+	Model lampModel(&cubeMesh, &lampShader, Material());
 	Model cubeModel(
-		cubeMesh, 
+		&cubeMesh, 
 		&lightingShader, 
 		Material(
 			glm::vec3(0.0f, 0.1f, 0.06f), 
@@ -184,45 +184,45 @@ int main()
 
 		lampModel.renderModel();
 
-		/*cubeModel.shader->use();
+		cubeModel.shader->use();
 		cubeModel.updateShader();
-		*/
-		//static float a = 0.0f;
-		//static float d = 0.0f;
-		//static float s = 0.0f;
-		//// light properties
+		
+		static float a = 0.0f;
+		static float d = 0.0f;
+		static float s = 0.0f;
+		// light properties
 
-		//light.setAmbient(glm::vec3(a));
-		//light.setDiffuse(glm::vec3(d));
-		//light.setSpecular(glm::vec3(s));
-		//light.setPosition(lightPos);
-		//light.updateShader(window.getCamera().Position);
+		light.setAmbient(glm::vec3(a));
+		light.setDiffuse(glm::vec3(d));
+		light.setSpecular(glm::vec3(s));
+		light.setPosition(lightPos);
+		light.updateShader(window.getCamera().Position);
 
-		//cubeModel.shader->setMat4("projection", projection);
-		//cubeModel.shader->setMat4("view", view);
-		//cubeModel.shader->setMat4("lsmodel", lsmodel);
+		cubeModel.shader->setMat4("projection", projection);
+		cubeModel.shader->setMat4("view", view);
+		cubeModel.shader->setMat4("lsmodel", lsmodel);
 
-		//cubeModel.bindMaps();
+		cubeModel.bindMaps();
 
-		//glm::mat4 model = glm::mat4(1.0f);
-		//for (glm::vec3 vec : cubePositions) {
-		//	model = glm::mat4(1.0f);
-		//	model = glm::translate(model, vec);
-		//	cubeModel.shader->setMat4("model", model);
-		//	
-		//	// render the cube
-		//	cubeModel.renderModel();
-		//}
+		glm::mat4 model = glm::mat4(1.0f);
+		for (glm::vec3 vec : cubePositions) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, vec);
+			cubeModel.shader->setMat4("model", model);
+			
+			// render the cube
+			cubeModel.renderModel();
+		}
 
-		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		//{
-		//	
-		//	ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
-		//	ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		//	ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
-		//	ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
-		//	ImGui::End();
-		//}
+		 //Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		{
+			
+			ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
+			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
+			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+			ImGui::End();
+		}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

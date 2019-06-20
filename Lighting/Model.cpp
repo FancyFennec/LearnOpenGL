@@ -1,6 +1,6 @@
 #include "Headers/Model.h"
 
-Model::Model(Mesh mesh, Shader* shader, Material material) : 
+Model::Model(Mesh *mesh, Shader* shader, Material material) : 
 	shader(shader),
 	mesh(mesh),
 	material(material)

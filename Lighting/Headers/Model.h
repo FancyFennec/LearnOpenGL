@@ -11,17 +11,17 @@
 class Model
 {
 public:
-	Model(Mesh mesh, Shader* shader, Material material);
+	Model(Mesh *mesh, Shader* shader, Material material);
 	~Model();
 
 	void loadTextures(const char* diffuse, const char* specular);
 	unsigned int loadTexture(char const * path);
 
 	void bindMaps();
-	void renderModel() { mesh.RenderMesh(); };
+	void renderModel() { mesh->RenderMesh(); };
 	void updateShader();
 
-	Mesh mesh;
+	Mesh *mesh;
 	Shader* shader;
 	Material material;
 
