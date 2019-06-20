@@ -43,7 +43,7 @@ int main()
 	ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer bindings
-	
+
 	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -64,8 +64,8 @@ int main()
 	Shader lightingShader("Shaders/colorShader.vs", "Shaders/colorShader.fs");
 	Shader lampShader("Shaders/lampShader.vs", "Shaders/lampShader.fs");
 
-	 // set up vertex data (and buffer(s)) and configure vertex attributes
-	// ------------------------------------------------------------------
+	// set up vertex data (and buffer(s)) and configure vertex attributes
+   // ------------------------------------------------------------------
 	float vertices[] = {
 		// positions          // normals           // texture coords
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
@@ -123,22 +123,22 @@ int main()
   glm::vec3(1.5f,  0.2f, -1.5f),
   glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
-	
+
 	Mesh cubeMesh;
 	cubeMesh.CreateMesh(vertices, 36);
 
 	Model lampModel(&cubeMesh, &lampShader, Material());
 	Model cubeModel(
-		&cubeMesh, 
-		&lightingShader, 
+		&cubeMesh,
+		&lightingShader,
 		Material(
-			glm::vec3(0.0f, 0.1f, 0.06f), 
+			glm::vec3(0.0f, 0.1f, 0.06f),
 			glm::vec3(0.0f, 0.51f, 0.51f),
-			glm::vec3(0.5f, 0.5f, 0.5f), 
+			glm::vec3(0.5f, 0.5f, 0.5f),
 			32.0f));
 
 	cubeModel.loadTextures("../Resources/container2.png", "../Resources/container2_specular.png");
-	
+
 	Light light(&lightingShader);
 
 	// shader configuration
@@ -173,44 +173,45 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		lsmodel = glm::rotate(lsmodel, (float) glfwGetTime(), glm::vec3(0, 1, 0));
+		//Set Ligh properties
+		lsmodel = glm::rotate(lsmodel, (float)glfwGetTime(), glm::vec3(0, 1, 0));
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
-		//draw the lamp object
-		lampModel.shader->useMVP(lsmodel, view, projection);
-		lampModel.renderModel();
-
-		//draw cube model
-		cubeModel.shader->useLsMVP(lsmodel, view, projection);
-		cubeModel.updateShader();
-		cubeModel.bindMaps();
-		
 		static float a = 0.0f;
 		static float d = 0.0f;
 		static float s = 0.0f;
-		
+
 		// light properties
 		light.setAmbient(glm::vec3(a));
 		light.setDiffuse(glm::vec3(d));
 		light.setSpecular(glm::vec3(s));
 		light.setPosition(lightPos);
-		light.updateShader(window.getCamera().Position);	
+		light.updateShader(window.getCamera().Position);
+
+		//draw the lamp object
+		lampModel.shader->useMVP(lsmodel, view, projection);
+		lampModel.renderModel();
+
+		//draw cube models
+		cubeModel.shader->useLsMVP(lsmodel, view, projection);
+		cubeModel.updateShader();
+		cubeModel.bindMaps();
 
 		glm::mat4 model = glm::mat4(1.0f);
 		for (glm::vec3 vec : cubePositions) {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, vec);
 			cubeModel.shader->setMat4("model", model);
-			
+
 			// render the cube
 			cubeModel.renderModel();
 		}
 
-		 //Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
-			
-			ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
+
+			ImGui::Begin("Set light properties");                          // Create a window called "Hello, world!" and append into it.
 			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
