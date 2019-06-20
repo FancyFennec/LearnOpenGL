@@ -156,61 +156,26 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// per-frame time logic
+		// per-frame time logic and process input
 		// --------------------
 		updateDeltaTime();
-
-
-		// input
-		// -----
 		window.processInput(deltaTime); //TODO:Mybe we can solve this different, such that we don't have to put in delta time here
 
-		// render
+		// clear screen and buffers
 		// ------
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// be sure to activate shader when setting uniforms/drawing objects
+		// world transformation
+		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = window.getCamera().GetViewMatrix();
 
 		glm::mat4 lsmodel = glm::mat4(1.0f);
 		lsmodel = glm::rotate(lsmodel, (float) glfwGetTime(), glm::vec3(0, 1, 0));
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
-		cubeModel.updateShader();
-		
-		static float a = 0.0f;
-		static float d = 0.0f;
-		static float s = 0.0f;
-		// light properties
-
-		light.setAmbient(glm::vec3(a));
-		light.setDiffuse(glm::vec3(d));
-		light.setSpecular(glm::vec3(s));
-		light.setPosition(lightPos);
-		light.updateShader(window.getCamera().Position);
-
-		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = window.getCamera().GetViewMatrix();
-		cubeModel.shader->setMat4("projection", projection);
-		cubeModel.shader->setMat4("view", view);
-		cubeModel.shader->setMat4("lsmodel", lsmodel);
-
-		cubeModel.bindMaps();
-
-		// world transformation
-		glm::mat4 model = glm::mat4(1.0f);
-		for (glm::vec3 vec : cubePositions) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, vec);
-			cubeModel.shader->setMat4("model", model);
-			
-			// render the cube
-			cubeModel.renderModel();
-		}
-
-		// also draw the lamp object
+		//draw the lamp object
 		lampModel.shader->use();
 
 		lampModel.shader->setMat4("projection", projection);
@@ -219,15 +184,45 @@ int main()
 
 		lampModel.renderModel();
 
+		/*cubeModel.shader->use();
+		cubeModel.updateShader();
+		*/
+		//static float a = 0.0f;
+		//static float d = 0.0f;
+		//static float s = 0.0f;
+		//// light properties
+
+		//light.setAmbient(glm::vec3(a));
+		//light.setDiffuse(glm::vec3(d));
+		//light.setSpecular(glm::vec3(s));
+		//light.setPosition(lightPos);
+		//light.updateShader(window.getCamera().Position);
+
+		//cubeModel.shader->setMat4("projection", projection);
+		//cubeModel.shader->setMat4("view", view);
+		//cubeModel.shader->setMat4("lsmodel", lsmodel);
+
+		//cubeModel.bindMaps();
+
+		//glm::mat4 model = glm::mat4(1.0f);
+		//for (glm::vec3 vec : cubePositions) {
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, vec);
+		//	cubeModel.shader->setMat4("model", model);
+		//	
+		//	// render the cube
+		//	cubeModel.renderModel();
+		//}
+
 		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		{
-			
-			ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
-			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
-			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
-			ImGui::End();
-		}
+		//{
+		//	
+		//	ImGui::Begin("Imgui Test Window");                          // Create a window called "Hello, world!" and append into it.
+		//	ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		//	ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
+		//	ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+		//	ImGui::End();
+		//}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
