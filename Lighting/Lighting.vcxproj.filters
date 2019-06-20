@@ -93,8 +93,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="lampShader.vs" />
-    <None Include="lampShader.fs" />
-  </ItemGroup>
 </Project>

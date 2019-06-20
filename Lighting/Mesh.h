@@ -6,9 +6,9 @@
 class Mesh
 {
 public:
-	Mesh(unsigned int numOfVertices);
+	Mesh();
 
-	void CreateMesh(float *vertices);
+	void CreateMesh(float *vertices, unsigned int numOfVertices);
 	void RenderMesh();
 	void ClearMesh();
 

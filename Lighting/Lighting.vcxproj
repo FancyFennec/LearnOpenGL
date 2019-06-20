@@ -173,10 +173,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="lampShader.fs" />
-    <None Include="lampShader.vs" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

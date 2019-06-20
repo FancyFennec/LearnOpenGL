@@ -126,17 +126,18 @@ int main()
   glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 	
-	Mesh cubeMesh(36);
-	cubeMesh.CreateMesh(vertices);
+	Mesh cubeMesh;
+	cubeMesh.CreateMesh(vertices, 36);
 
 	unsigned int diffuseMap = loadTexture("../Resources/container2.png");
 	unsigned int specularMap = loadTexture("../Resources/container2_specular.png");
 
-	// shader configuration
-	// --------------------
-	lightingShader.use();
-	lightingShader.setInt("material.diffuse", 0);
-	lightingShader.setInt("material.specular", 1);
+	// bind diffuse map
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specularMap);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -158,18 +159,28 @@ int main()
 		// -----
 		window.processInput(deltaTime); //TODO:Mybe we can solve this different, such that we don't have to put in delta time here
 
-		// render
-		// ------
+		// Clear screen and buffers
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// be sure to activate shader when setting uniforms/drawing objects
-
+		// view/projection transformations
+		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = window.getCamera().GetViewMatrix();
 		glm::mat4 lsmodel = glm::mat4(1.0f);
 		lsmodel = glm::rotate(lsmodel, (float) glfwGetTime(), glm::vec3(0, 1, 0));
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
+		// draw the lamp object
+		lampShader.use();
+
+		lampShader.setMat4("projection", projection);
+		lampShader.setMat4("view", view);
+		lampShader.setMat4("model", lsmodel);
+
+		cubeMesh.RenderMesh();
+
+		// draw crates
 		lightingShader.use();
 
 		lightingShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
@@ -187,19 +198,9 @@ int main()
 		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", window.getCamera().Position);
 
-		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = window.getCamera().GetViewMatrix();
 		lightingShader.setMat4("projection", projection);
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("lsmodel", lsmodel);
-
-		// bind diffuse map
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-		// bind specular map
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		// world transformation
 		glm::mat4 model = glm::mat4(1.0f);
@@ -211,16 +212,6 @@ int main()
 			// render the cube
 			cubeMesh.RenderMesh();
 		}
-
-		// also draw the lamp object
-		lampShader.use();
-
-		lampShader.setMat4("projection", projection);
-		lampShader.setMat4("view", view);
-		lampShader.setMat4("model", lsmodel);
-
-		cubeMesh.RenderMesh();
-
 
 		// Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
