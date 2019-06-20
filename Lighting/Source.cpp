@@ -147,6 +147,10 @@ int main()
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 lsmodel = glm::mat4(1.0f);
+
 	// render loop
    // -----------
 	while (!window.getShouldClose())
@@ -160,49 +164,38 @@ int main()
 		// --------------------
 		updateDeltaTime();
 		window.processInput(deltaTime); //TODO:Mybe we can solve this different, such that we don't have to put in delta time here
-
+		// world transformation
+		projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		view = window.getCamera().GetViewMatrix();
+		lsmodel = glm::mat4(1.0f);
 		// clear screen and buffers
 		// ------
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// world transformation
-		glm::mat4 projection = glm::perspective(glm::radians(window.getCamera().Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = window.getCamera().GetViewMatrix();
-
-		glm::mat4 lsmodel = glm::mat4(1.0f);
 		lsmodel = glm::rotate(lsmodel, (float) glfwGetTime(), glm::vec3(0, 1, 0));
 		lsmodel = glm::translate(lsmodel, lightPos);
 		lsmodel = glm::scale(lsmodel, glm::vec3(0.2f)); // a smaller cube
 
 		//draw the lamp object
-		lampModel.shader->use();
-
-		lampModel.shader->setMat4("projection", projection);
-		lampModel.shader->setMat4("view", view);
-		lampModel.shader->setMat4("model", lsmodel);
-
+		lampModel.shader->useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		cubeModel.shader->use();
+		//draw cube model
+		cubeModel.shader->useLsMVP(lsmodel, view, projection);
 		cubeModel.updateShader();
+		cubeModel.bindMaps();
 		
 		static float a = 0.0f;
 		static float d = 0.0f;
 		static float s = 0.0f;
+		
 		// light properties
-
 		light.setAmbient(glm::vec3(a));
 		light.setDiffuse(glm::vec3(d));
 		light.setSpecular(glm::vec3(s));
 		light.setPosition(lightPos);
-		light.updateShader(window.getCamera().Position);
-
-		cubeModel.shader->setMat4("projection", projection);
-		cubeModel.shader->setMat4("view", view);
-		cubeModel.shader->setMat4("lsmodel", lsmodel);
-
-		cubeModel.bindMaps();
+		light.updateShader(window.getCamera().Position);	
 
 		glm::mat4 model = glm::mat4(1.0f);
 		for (glm::vec3 vec : cubePositions) {

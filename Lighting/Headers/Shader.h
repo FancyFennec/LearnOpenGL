@@ -134,6 +134,20 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 	}
 
+	void useMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection) {
+		use();
+		setMat4("projection", projection);
+		setMat4("view", view);
+		setMat4("model", model);
+	}
+
+	void useLsMVP(glm::mat4 lsmodel, glm::mat4 view, glm::mat4 projection) {
+		use();
+		setMat4("projection", projection);
+		setMat4("view", view);
+		setMat4("lsmodel", lsmodel);
+	}
+
 private:
 	// utility function for checking shader compilation/linking errors.
 	// ------------------------------------------------------------------------
