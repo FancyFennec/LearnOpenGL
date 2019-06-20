@@ -61,8 +61,9 @@ int main()
 
 	// build and compile our shader program
 	// ------------------------------------
-	Shader lightingShader("Shaders/colorShader.vs", "Shaders/colorShader.fs");
 	Shader lampShader("Shaders/lampShader.vs", "Shaders/lampShader.fs");
+	Shader lightingShader("Shaders/colorShader.vs", "Shaders/colorShader.fs");
+	Shader simpleShader("Shaders/simpleShader.vs", "Shaders/simpleShader.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
    // ------------------------------------------------------------------
@@ -127,12 +128,12 @@ int main()
 	Mesh cubeMesh;
 	cubeMesh.CreateMesh(vertices, 36);
 
+	Model simpleModel(&cubeMesh, &simpleShader, glm::vec3(1.0f, 0.2f, 0.3f));
 	Model lampModel(&cubeMesh, &lampShader, Material());
 	Model cubeModel(
 		&cubeMesh,
 		&lightingShader,
 		Material(
-			glm::vec3(0.0f, 0.1f, 0.06f),
 			glm::vec3(0.0f, 0.51f, 0.51f),
 			glm::vec3(0.5f, 0.5f, 0.5f),
 			32.0f));
@@ -193,20 +194,29 @@ int main()
 		lampModel.shader->useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		//draw cube models
-		cubeModel.shader->useLsMVP(lsmodel, view, projection);
-		cubeModel.updateShader();
-		cubeModel.bindMaps();
-
+		//Draw simple cube
+		simpleModel.shader->useLsMVP(lsmodel, view, projection);
+		simpleModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
-		for (glm::vec3 vec : cubePositions) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, vec);
-			cubeModel.shader->setMat4("model", model);
+		model = glm::translate(model, glm::vec3(0, 0, 0));
+		model = glm::scale(model, glm::vec3(1.5, 1.5, 1.5));
+		simpleModel.shader->setMat4("model", model);
+		simpleModel.renderModel();
 
-			// render the cube
-			cubeModel.renderModel();
-		}
+		////draw cube models
+		//cubeModel.shader->useLsMVP(lsmodel, view, projection);
+		//cubeModel.updateShader();
+		//cubeModel.bindMaps();
+
+		//model = glm::mat4(1.0f);
+		//for (glm::vec3 vec : cubePositions) {
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, vec);
+		//	cubeModel.shader->setMat4("model", model);
+
+		//	// render the cube
+		//	cubeModel.renderModel();
+		//}
 
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
