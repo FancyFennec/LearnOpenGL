@@ -11,8 +11,7 @@
 class Model
 {
 public:
-	Model(Mesh *mesh, Shader* shader, Material material);
-	Model(Mesh *mesh, Shader* shader, glm::vec3 colour);
+	Model(Mesh *mesh, Shader* shader);
 	~Model();
 
 	void loadTextures(const char* diffuse, const char* specular);
@@ -25,14 +24,8 @@ public:
 
 	Mesh *mesh;
 	Shader* shader;
-	Material material;
 
-	glm::vec3 colour;
 	float shininess;
-
-private:
-	unsigned int diffuseMap;
-	unsigned int specularMap;
 };
 
 #endif
