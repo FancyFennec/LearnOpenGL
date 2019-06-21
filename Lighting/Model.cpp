@@ -1,20 +1,20 @@
 #include "Headers/Model.h"
 
-Model::Model(Mesh *mesh, Shader* shader, Material material) : 
+Model::Model(Mesh& mesh, Shader& shader, Material& material) : 
 	shader(shader),
 	mesh(mesh),
 	material(material)
 {
-	shader->use();
+	shader.use();
 }
 
-Model::Model(Mesh *mesh, Shader* shader, glm::vec3 colour) :
+Model::Model(Mesh &mesh, Shader& shader, glm::vec3 colour) :
 	shader(shader),
 	mesh(mesh),
 	material(Material()),
 	colour(colour)
 {
-	shader->use();
+	shader.use();
 	shininess = 32;
 }
 
@@ -27,9 +27,9 @@ void Model::loadTextures(const char * diffuse, const char * specular)
 {
 	diffuseMap = loadTexture(diffuse);
 	specularMap = loadTexture(specular);
-	shader->use();
-	shader->setInt("material.diffuse", 0);
-	shader->setInt("material.specular", 1);
+	shader.use();
+	shader.setInt("material.diffuse", 0);
+	shader.setInt("material.specular", 1);
 }
 
 unsigned int Model::loadTexture(char const * path)
@@ -81,14 +81,14 @@ void Model::bindMaps()
 
 void Model::updateShader()
 {
-	shader->setVec3("material.diffuse", material.diffuse);
-	shader->setVec3("material.specular", material.specular);
-	shader->setFloat("material.shininess", material.shininess);
+	shader.setVec3("material.diffuse", material.diffuse);
+	shader.setVec3("material.specular", material.specular);
+	shader.setFloat("material.shininess", material.shininess);
 }
 
 void Model::updateColourShader()
 {
 	//shader->setVec3("material.ambient", material.ambient);
-	shader->setVec3("colour", colour);
-	shader->setFloat("shininess", shininess);
+	shader.setVec3("colour", colour);
+	shader.setFloat("shininess", shininess);
 }

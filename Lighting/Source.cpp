@@ -128,11 +128,12 @@ int main()
 	Mesh cubeMesh;
 	cubeMesh.CreateMesh(vertices, 36);
 
-	Model simpleModel(&cubeMesh, &simpleShader, glm::vec3(1.0f, 0.2f, 0.3f));
-	Model lampModel(&cubeMesh, &lampShader, Material());
+	Model simpleModel(cubeMesh, simpleShader, glm::vec3(1.0f, 0.2f, 0.3f));
+	Model lampModel(cubeMesh, lampShader, Material());
+
 	Model cubeModel(
-		&cubeMesh,
-		&lightingShader,
+		cubeMesh,
+		lightingShader,
 		Material(
 			glm::vec3(0.0f, 0.51f, 0.51f),
 			glm::vec3(0.5f, 0.5f, 0.5f),
@@ -140,7 +141,7 @@ int main()
 
 	cubeModel.loadTextures("../Resources/container2.png", "../Resources/container2_specular.png");
 
-	Light light(&lightingShader);
+	Light light(lightingShader);
 
 	// shader configuration
 	// --------------------
@@ -190,22 +191,22 @@ int main()
 		light.setViewPos(window.getCamera().Position);
 
 		//draw the lamp object
-		lampModel.shader->useMVP(lsmodel, view, projection);
+		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
 		//Draw simple cube
-		simpleModel.shader->useLsMVP(lsmodel, view, projection);
+		simpleModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
 		light.updateShader();
 		simpleModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::scale(model, glm::vec3(1.5, 1.5, 1.5));
-		simpleModel.shader->setMat4("model", model);
+		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
 		//draw cube models
-		cubeModel.shader->useLsMVP(lsmodel, view, projection);
+		cubeModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
 		light.updateShader();
 		cubeModel.updateShader();
@@ -215,7 +216,7 @@ int main()
 		for (glm::vec3 vec : cubePositions) {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, vec);
-			cubeModel.shader->setMat4("model", model);
+			cubeModel.shader.setMat4("model", model);
 
 			// render the cube
 			cubeModel.renderModel();
