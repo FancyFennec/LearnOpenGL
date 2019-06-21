@@ -183,12 +183,11 @@ int main()
 		static float d = 0.0f;
 		static float s = 0.0f;
 
-		// light properties
 		light.setAmbient(glm::vec3(a));
 		light.setDiffuse(glm::vec3(d));
 		light.setSpecular(glm::vec3(s));
 		light.setPosition(lightPos);
-		light.updateShader(window.getCamera().Position);
+		light.setViewPos(window.getCamera().Position);
 
 		//draw the lamp object
 		lampModel.shader->useMVP(lsmodel, view, projection);
@@ -196,6 +195,8 @@ int main()
 
 		//Draw simple cube
 		simpleModel.shader->useLsMVP(lsmodel, view, projection);
+		// light properties
+		light.updateShader();
 		simpleModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, 0));
@@ -203,20 +204,22 @@ int main()
 		simpleModel.shader->setMat4("model", model);
 		simpleModel.renderModel();
 
-		////draw cube models
-		//cubeModel.shader->useLsMVP(lsmodel, view, projection);
-		//cubeModel.updateShader();
-		//cubeModel.bindMaps();
+		//draw cube models
+		cubeModel.shader->useLsMVP(lsmodel, view, projection);
+		// light properties
+		light.updateShader();
+		cubeModel.updateShader();
+		cubeModel.bindMaps();
 
-		//model = glm::mat4(1.0f);
-		//for (glm::vec3 vec : cubePositions) {
-		//	model = glm::mat4(1.0f);
-		//	model = glm::translate(model, vec);
-		//	cubeModel.shader->setMat4("model", model);
+		model = glm::mat4(1.0f);
+		for (glm::vec3 vec : cubePositions) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, vec);
+			cubeModel.shader->setMat4("model", model);
 
-		//	// render the cube
-		//	cubeModel.renderModel();
-		//}
+			// render the cube
+			cubeModel.renderModel();
+		}
 
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
