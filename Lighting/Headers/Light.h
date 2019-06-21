@@ -7,9 +7,9 @@
 class Light
 {
 public:
-	Light(Shader* shader);
-	Light(Shader* shader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
-	Light(Shader* shader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 position);
+	Light(Shader& shader);
+	Light(Shader& shader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+	Light(Shader& shader, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 position);
 	~Light();
 
 	void updateShader(glm::vec3& viewPos);
@@ -29,7 +29,7 @@ public:
 	glm::vec3 specular;
 	glm::vec3 position;
 
-	Shader* shader;
+	Shader& shader;
 };
 
 #endif
