@@ -6,24 +6,19 @@
 #include "Shader.h"
 #include "stb_image.h"
 
-
-
 class Model
 {
 public:
-	Model(Mesh *mesh, Shader* shader);
+	Model(Mesh& mesh, Shader& shader);
+	Model(Shader& shader);
 	~Model();
 
-	void loadTextures(const char* diffuse, const char* specular);
-	unsigned int loadTexture(char const * path);
-
-	void bindMaps();
-	void renderModel() { mesh->RenderMesh(); };
-	void updateShader();
+	void renderModel() { mesh.RenderMesh(); };
+	void useCubeMesh();
 	void updateColourShader();
 
-	Mesh *mesh;
-	Shader* shader;
+	Mesh mesh;
+	Shader shader;
 
 	float shininess;
 };

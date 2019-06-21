@@ -16,20 +16,20 @@ public:
 	std::vector<std::vector<float>> lookupMesh;
 
 	glm::vec3 vertices[12] = {
-		glm::vec3(-0.5f, 0.5f, 0.0f),
-		glm::vec3(0.0f, -0.5f, 0.5f),
-		glm::vec3(0.5f, -0.5f, 0.0f),
-		glm::vec3(0.0f, -0.5f, -0.5f),
+		glm::vec3(-0.5f, -0.5f,  0.0f),
+		glm::vec3( 0.0f, -0.5f,  0.5f),
+		glm::vec3( 0.5f, -0.5f,  0.0f),
+		glm::vec3( 0.0f, -0.5f, -0.5f),
 
-		glm::vec3(-0.5f, 0.5f, 0.0f),
-		glm::vec3(0.0f, 0.5f, 0.5f),
-		glm::vec3(0.5f, 0.5f, 0.0f),
-		glm::vec3(0.0f, 0.5f, -0.5f),
+		glm::vec3(-0.5f, 0.5f,  0.0f),
+		glm::vec3( 0.0f, 0.5f,  0.5f),
+		glm::vec3( 0.5f, 0.5f,  0.0f),
+		glm::vec3( 0.0f, 0.5f, -0.5f),
 
-		glm::vec3(-0.5f, 0.0f, 0.5f),
-		glm::vec3(0.5f, 0.0f, 0.5f),
+		glm::vec3(-0.5f, 0.0f,  0.5f),
+		glm::vec3( 0.5f, 0.0f,  0.5f),
 		glm::vec3(-0.5f, 0.0f, -0.5f),
-		glm::vec3(0.5f, 0.0f, -0.5f)
+		glm::vec3( 0.5f, 0.0f, -0.5f)
 	};
 
 	int edgeTable[256] = {
@@ -82,7 +82,7 @@ inline void MarchingCube::generateMeshes()
 	for (int i = 0; i < 256; i++) {
 
 		int currentInt = edgeTable[i];
-		std::vector<float> currentMesh;
+		std::vector<float> currentMesh = {};
 
 		for (int k = 0; k < 12; k++) {
 			if (currentInt & (1 << k)) {

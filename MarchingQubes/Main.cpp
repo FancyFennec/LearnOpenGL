@@ -6,6 +6,7 @@
 #include "Headers/Window.h"
 #include "Headers/Model.h"
 #include "Headers/Light.h"
+#include "Headers/MarchingCube.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -66,57 +67,17 @@ int main()
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
    // ------------------------------------------------------------------
-	float vertices[] = {
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.2f, 0.3f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f
-	};
+	
+	MarchingCube mc;
+	std::cout << "vector size: " << mc.lookupMesh[45].size() << "\n";
 
 	Mesh cubeMesh;
-	cubeMesh.CreateMesh(vertices, 36);
+	cubeMesh.CreateMesh(mc.lookupMesh[45].data(), mc.lookupMesh[45].size() / 9);
 	Light light(&simpleShader);
 
-	Model simpleModel(&cubeMesh, &simpleShader);
-	Model lampModel(&cubeMesh, &lampShader);
+	Model simpleModel(cubeMesh, simpleShader);
+	Model lampModel(lampShader);
+	lampModel.useCubeMesh();
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -162,17 +123,20 @@ int main()
 		light.setViewPos(window.getCamera().Position);
 
 		//draw the lamp object
-		lampModel.shader->useMVP(lsmodel, view, projection);
+		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
+		static int meshNumber = 45;
+
 		//Draw simple cube
-		simpleModel.shader->useLsMVP(lsmodel, view, projection);
+		simpleModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
 		light.updateShader();
 		simpleModel.updateColourShader();
+		simpleModel.mesh.CreateMesh(mc.lookupMesh[meshNumber].data(), mc.lookupMesh[meshNumber].size()/9);
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -3));
-		simpleModel.shader->setMat4("model", model);
+		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
@@ -182,6 +146,8 @@ int main()
 			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+
+			ImGui::SliderInt("Mesh Number", &meshNumber, 0, 255);
 			ImGui::End();
 		}
 
