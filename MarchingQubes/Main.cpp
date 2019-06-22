@@ -74,8 +74,11 @@ int main()
 	
 	MarchingCube mc;
 
-	int x = 300, y = 300, z = 300;
+	int x = 100, y = 100, z = 100;
+	static float isoLevel = 0.3;
+	float oldIsoLevel = 0.3f;
 
+#pragma omp parallel for
 	for (int i = -1; i < x + 1; ++i) {
 		for (int j = -1; j < y + 1; ++j) {
 			for (int k = -1; k < z + 1; ++k) {
@@ -147,6 +150,12 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
+		//TODO: Fix the updating of the isolevel
+		/*if (oldIsoLevel != isoLevel) {
+			mesh = mc.updateIsoLevel(isoLevel);
+			cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+			simpleModel = Model(cubeMesh, simpleShader);
+		}*/
 
 		//Draw simple cube
 		simpleModel.shader.useLsMVP(lsmodel, view, projection);
@@ -159,6 +168,7 @@ int main()
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
+		oldIsoLevel = isoLevel;
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
 
@@ -166,6 +176,8 @@ int main()
 			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+
+			ImGui::SliderFloat("Isolevel", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
 		}

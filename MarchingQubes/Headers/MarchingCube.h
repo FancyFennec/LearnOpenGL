@@ -10,6 +10,7 @@ public:
 
 	
 	std::vector<float> generateMesh(float* booleanField, int m, int n, int k);
+	std::vector<float> updateIsoLevel(float& isoLevel);
 
 	std::vector<std::vector<float>> lookupMesh;
 
@@ -19,6 +20,11 @@ private:
 	void generateVertex(std::vector<float> & currentMesh, glm::vec3 &v, glm::vec3 &n, glm::vec3 &colour);
 
 	int getIndex(int i, int j, int k, int m, int n) { return k * m * n + j * m + i; };
+
+	float* booleanField;
+	int m; 
+	int n; 
+	int k;
 };
 	
 
@@ -55,9 +61,15 @@ inline void MarchingCube::generateMeshTable()
 
 inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m, int n, int l)
 {
+	this->booleanField = booleanField;
+	this->m = m;
+	this->n = n;
+	this->k = l;
+
 	float isoLevel = 0.45f;
 	std::vector<float> mesh = {};
 
+#pragma omp parallel for
 	for (int k = 0; k < l - 1; k++) {
 		for (int j = 0; j < n - 1; j++) {
 			for (int i = 0; i < m - 1; i++) {
@@ -72,6 +84,47 @@ inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m,
 				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k, m, n)] > isoLevel ? 1 << 5 : 0 << 5;
 				lookUpindex |= booleanField[getIndex(i + 1, j    , k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
 				lookUpindex |= booleanField[getIndex(i    , j    , k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
+
+				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
+
+					mesh.push_back(lookupMesh[lookUpindex].data()[x] + i);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 1] - k);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 2] - j);
+
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 3]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 4]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 5]);
+
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 6]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 7]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 8]);
+				}
+			}
+		}
+	}
+
+	return mesh;
+}
+
+inline std::vector<float> MarchingCube::updateIsoLevel(float & isoLevel)
+{
+	std::vector<float> mesh = {};
+
+#pragma omp parallel for
+	for (int l = 0; l < k - 1; l++) {
+		for (int j = 0; j < n - 1; j++) {
+			for (int i = 0; i < m - 1; i++) {
+				int lookUpindex = 0;
+
+				lookUpindex |= booleanField[getIndex(i, j + 1, k + 1, m, n)] > isoLevel ? 1 << 0 : 0 << 0;
+				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k + 1, m, n)] > isoLevel ? 1 << 1 : 0 << 1;
+				lookUpindex |= booleanField[getIndex(i + 1, j, k + 1, m, n)] > isoLevel ? 1 << 2 : 0 << 2;
+				lookUpindex |= booleanField[getIndex(i, j, k + 1, m, n)] > isoLevel ? 1 << 3 : 0 << 3;
+
+				lookUpindex |= booleanField[getIndex(i, j + 1, k, m, n)] > isoLevel ? 1 << 4 : 0 << 4;
+				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k, m, n)] > isoLevel ? 1 << 5 : 0 << 5;
+				lookUpindex |= booleanField[getIndex(i + 1, j, k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
+				lookUpindex |= booleanField[getIndex(i, j, k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
 
 				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
 
