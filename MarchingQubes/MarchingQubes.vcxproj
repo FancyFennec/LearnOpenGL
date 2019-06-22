@@ -179,6 +179,7 @@
     <ClInclude Include="Headers\Material.h" />
     <ClInclude Include="Headers\Light.h" />
     <ClInclude Include="Headers\MarchingCube.h" />
+    <ClInclude Include="Headers\Tables.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

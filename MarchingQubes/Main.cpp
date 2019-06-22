@@ -25,6 +25,13 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 const char* glsl_version = "#version 130";
 
+float test[] = {
+					 0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,
+					 0, 0, 0, 0,   0, 1, 1, 0,   0, 1, 1, 0,  0, 0, 0, 0,
+					 0, 0, 0, 0,   0, 0, 1, 0,   0, 1, 1, 0,  0, 0, 0, 0,
+					 0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0
+};
+
 int main()
 {
 	window.initialise();
@@ -69,10 +76,12 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
+	std::vector<float> mesh = mc.generateMesh(test, 4, 4, 4);
 	std::cout << "vector size: " << mc.lookupMesh[45].size() << "\n";
 
 	Mesh cubeMesh;
-	cubeMesh.CreateMesh(mc.lookupMesh[45].data(), mc.lookupMesh[45].size() / 9);
+	//cubeMesh.CreateMesh(mc.lookupMesh[45].data(), mc.lookupMesh[45].size() / 9);
+	cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
 	Light light(&simpleShader);
 
 	Model simpleModel(cubeMesh, simpleShader);
@@ -126,14 +135,12 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		static int meshNumber = 45;
 
 		//Draw simple cube
 		simpleModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
 		light.updateShader();
 		simpleModel.updateColourShader();
-		simpleModel.mesh.CreateMesh(mc.lookupMesh[meshNumber].data(), mc.lookupMesh[meshNumber].size()/9);
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -3));
 		simpleModel.shader.setMat4("model", model);
@@ -147,7 +154,6 @@ int main()
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			ImGui::SliderInt("Mesh Number", &meshNumber, 0, 255);
 			ImGui::End();
 		}
 
