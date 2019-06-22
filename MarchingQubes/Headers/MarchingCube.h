@@ -55,6 +55,7 @@ inline void MarchingCube::generateMeshTable()
 
 inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m, int n, int l)
 {
+	float isoLevel = 0.45f;
 	std::vector<float> mesh = {};
 
 	for (int k = 0; k < l - 1; k++) {
@@ -62,17 +63,15 @@ inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m,
 			for (int i = 0; i < m - 1; i++) {
 				int lookUpindex = 0;
 
-				lookUpindex |= booleanField[getIndex(i, j + 1, k + 1, m, n)] ? 1 << 0 : 0 << 0;
-				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k + 1, m, n)] ? 1 << 1 : 0 << 1;
-				lookUpindex |= booleanField[getIndex(i + 1, j, k + 1, m, n)] ? 1 << 2 : 0 << 2;
-				lookUpindex |= booleanField[getIndex(i, j, k + 1, m, n)] ? 1 << 3 : 0 << 3;
+				lookUpindex |= booleanField[getIndex(i    , j + 1, k + 1, m, n)] > isoLevel ? 1 << 0 : 0 << 0;
+				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k + 1, m, n)] > isoLevel ? 1 << 1 : 0 << 1;
+				lookUpindex |= booleanField[getIndex(i + 1, j    , k + 1, m, n)] > isoLevel ? 1 << 2 : 0 << 2;
+				lookUpindex |= booleanField[getIndex(i    , j    , k + 1, m, n)] > isoLevel ? 1 << 3 : 0 << 3;
 
-				lookUpindex |= booleanField[getIndex(i, j + 1, k, m, n)] ? 1 << 4 : 0 << 4;
-				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k, m, n)] ? 1 << 5 : 0 << 5;
-				lookUpindex |= booleanField[getIndex(i + 1, j, k, m, n)] ? 1 << 6 : 0 << 6;
-				lookUpindex |= booleanField[getIndex(i,     j,     k, m, n)] ? 1 << 7 : 0 << 7;
-
-				std::cout << "Logging lookUpIndex: " << lookUpindex << "\n";
+				lookUpindex |= booleanField[getIndex(i    , j + 1, k, m, n)] > isoLevel ? 1 << 4 : 0 << 4;
+				lookUpindex |= booleanField[getIndex(i + 1, j + 1, k, m, n)] > isoLevel ? 1 << 5 : 0 << 5;
+				lookUpindex |= booleanField[getIndex(i + 1, j    , k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
+				lookUpindex |= booleanField[getIndex(i    , j    , k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
 
 				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
 

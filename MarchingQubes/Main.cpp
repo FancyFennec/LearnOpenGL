@@ -7,6 +7,7 @@
 #include "Headers/Model.h"
 #include "Headers/Light.h"
 #include "Headers/MarchingCube.h"
+#include "Headers/pNoise.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -16,6 +17,7 @@ void updateDeltaTime();
 
 // camera
 Window window(Camera(glm::vec3(0.0f, 0.0f, 3.0f)), SCR_WIDTH, SCR_HEIGHT);
+PerlinNoise pNoise = PerlinNoise(3);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -25,12 +27,7 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 const char* glsl_version = "#version 130";
 
-float test[] = {
-					 0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,
-					 0, 0, 0, 0,   0, 1, 1, 0,   0, 1, 1, 0,  0, 0, 0, 0,
-					 0, 0, 0, 0,   0, 0, 1, 0,   0, 1, 1, 0,  0, 0, 0, 0,
-					 0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0
-};
+std::vector<float> gridValues = {};
 
 int main()
 {
@@ -76,8 +73,23 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
-	std::vector<float> mesh = mc.generateMesh(test, 4, 4, 4);
-	std::cout << "vector size: " << mc.lookupMesh[45].size() << "\n";
+
+	int x = 300, y = 300, z = 300;
+
+	for (int i = -1; i < x + 1; ++i) {
+		for (int j = -1; j < y + 1; ++j) {
+			for (int k = -1; k < z + 1; ++k) {
+				if (i == -1 || j == -1 || k == -1 || i == x || j == y || k == z) {
+					gridValues.push_back(0);
+				} else {
+					gridValues.push_back((float)pNoise.noise((double)i / ((double)x), (double)j / ((double)y), (double)k / ((double)z)));
+				}
+				
+			}
+		}
+	}
+
+	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
 
 	Mesh cubeMesh;
 	//cubeMesh.CreateMesh(mc.lookupMesh[45].data(), mc.lookupMesh[45].size() / 9);
@@ -143,6 +155,7 @@ int main()
 		simpleModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -3));
+		model = glm::scale(model, glm::vec3(4 / ((float)x), 4 / ((float)y), 4 / ((float)z)));
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
