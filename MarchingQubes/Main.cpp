@@ -15,19 +15,16 @@
 
 void updateDeltaTime();
 
+const char* glsl_version = "#version 130";
 // camera
 Window window(Camera(glm::vec3(0.0f, 0.0f, 3.0f)), SCR_WIDTH, SCR_HEIGHT);
-PerlinNoise pNoise = PerlinNoise(3);
+PerlinNoise pNoise = PerlinNoise(4);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-
-const char* glsl_version = "#version 130";
-
-std::vector<float> gridValues = {};
 
 int main()
 {
@@ -73,11 +70,9 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
-
 	int x = 100, y = 100, z = 100;
-	static float isoLevel = 0.3;
-	float oldIsoLevel = 0.3f;
 
+	std::vector<float> gridValues = {};
 #pragma omp parallel for
 	for (int i = -1; i < x + 1; ++i) {
 		for (int j = -1; j < y + 1; ++j) {
@@ -85,17 +80,18 @@ int main()
 				if (i == -1 || j == -1 || k == -1 || i == x || j == y || k == z) {
 					gridValues.push_back(0);
 				} else {
-					gridValues.push_back((float)pNoise.noise((double)i / ((double)x), (double)j / ((double)y), (double)k / ((double)z)));
+					gridValues.push_back((float)pNoise.noise(
+						3 * (double)i / ((double)x),
+						3 * (double)j / ((double)y),
+						3 * (double)k / ((double)z)));
 				}
 				
 			}
 		}
 	}
 
-	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
-
 	Mesh cubeMesh;
-	//cubeMesh.CreateMesh(mc.lookupMesh[45].data(), mc.lookupMesh[45].size() / 9);
+	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
 	cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
 	Light light(&simpleShader);
 
@@ -150,13 +146,6 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		//TODO: Fix the updating of the isolevel
-		/*if (oldIsoLevel != isoLevel) {
-			mesh = mc.updateIsoLevel(isoLevel);
-			cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
-			simpleModel = Model(cubeMesh, simpleShader);
-		}*/
-
 		//Draw simple cube
 		simpleModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
@@ -168,7 +157,6 @@ int main()
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
-		oldIsoLevel = isoLevel;
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
 
@@ -176,8 +164,6 @@ int main()
 			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
-
-			ImGui::SliderFloat("Isolevel", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
 		}
