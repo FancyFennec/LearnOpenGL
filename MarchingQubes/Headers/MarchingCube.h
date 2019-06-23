@@ -140,9 +140,13 @@ inline std::vector<float> MarchingCube::updateIsoLevel(float& isoLevel)
 					mesh.push_back(lookupMesh[lookUpindex].data()[x + 4]);
 					mesh.push_back(lookupMesh[lookUpindex].data()[x + 5]);
 
-					mesh.push_back(lookupMesh[lookUpindex].data()[x + 6]);
-					mesh.push_back(lookupMesh[lookUpindex].data()[x + 7]);
-					mesh.push_back(lookupMesh[lookUpindex].data()[x + 8]);
+					mesh.push_back(
+						(float)k / float(l) *lookupMesh[lookUpindex].data()[x + 6]
+						+ (1 - (float)k / float(l)));
+					mesh.push_back((float)k / float(l) *lookupMesh[lookUpindex].data()[x + 7]
+						+ (1 - (float)k / float(l)));
+					mesh.push_back((float)k / float(l) *lookupMesh[lookUpindex].data()[x + 8]
+						+ (1 - (float)k / float(l)));
 				}
 			}
 		}

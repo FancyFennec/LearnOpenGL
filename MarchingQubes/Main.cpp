@@ -70,7 +70,7 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
-	int x = 10, y = 10, z = 10;
+	int x = 30, y = 30, z = 30;
 
 	std::vector<float> gridValues = {};
 #pragma omp parallel for
@@ -90,15 +90,14 @@ int main()
 		}
 	}
 
-	Mesh cubeMesh;
+	Mesh perlinMesh;
 	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
-	cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+	perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
 
 	Light light(&simpleShader);
 
-	Model simpleModel(cubeMesh, simpleShader);
+	Model simpleModel(perlinMesh, simpleShader);
 	Model lampModel(lampShader);
-	lampModel.useCubeMesh();
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -106,7 +105,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 lsmodel = glm::mat4(1.0f);
 
-	static float isoLevel = 1.6;
+	static float isoLevel = 0.65f;
 	float oldIsoLevel = isoLevel;
 	// render loop
    // -----------
@@ -145,13 +144,14 @@ int main()
 		light.setPosition(lightPos);
 		light.setViewPos(window.getCamera().Position);
 
+		//TODO: Lamp is not being rendered correctly
 		//draw the lamp object
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
 		if (oldIsoLevel != isoLevel) {
 			mesh = mc.updateIsoLevel(isoLevel);
-			cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+			perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
 		}
 
 		//Draw simple cube
@@ -169,10 +169,10 @@ int main()
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
 
-			ImGui::Begin("Set light properties");                          // Create a window called "Hello, world!" and append into it.
-			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
-			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+			ImGui::Begin("Chose iso level");                  
+			//ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f); 
+			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
+			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
 			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
@@ -193,7 +193,7 @@ int main()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	cubeMesh.~Mesh();
+	perlinMesh.~Mesh();
 	window.~Window();
 	return 0;
 }

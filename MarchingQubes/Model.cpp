@@ -14,16 +14,6 @@ Model::Model(Shader& shader) :
 	shader(shader),
 	mesh(Mesh())
 {
-	shader.use();
-	shininess = 32;
-}
-
-Model::~Model()
-{
-}
-
-void Model::useCubeMesh()
-{
 	float vertices[] = {
 		// positions          // normals           // colour
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.2f, 0.3f,
@@ -70,6 +60,12 @@ void Model::useCubeMesh()
 	};
 
 	mesh.CreateMesh(vertices, 36);
+	shader.use();
+	shininess = 32;
+}
+
+Model::~Model()
+{
 }
 
 void Model::updateColourShader()

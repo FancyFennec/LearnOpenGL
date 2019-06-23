@@ -14,7 +14,6 @@ public:
 	~Model();
 
 	void renderModel() { mesh.RenderMesh(); };
-	void useCubeMesh();
 	void updateColourShader();
 
 	Mesh& mesh;
