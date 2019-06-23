@@ -17,8 +17,8 @@ public:
 	void useCubeMesh();
 	void updateColourShader();
 
-	Mesh mesh;
-	Shader shader;
+	Mesh& mesh;
+	Shader& shader;
 
 	float shininess;
 };

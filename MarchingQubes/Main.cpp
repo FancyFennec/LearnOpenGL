@@ -70,7 +70,7 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
-	int x = 100, y = 100, z = 100;
+	int x = 10, y = 10, z = 10;
 
 	std::vector<float> gridValues = {};
 #pragma omp parallel for
@@ -93,6 +93,7 @@ int main()
 	Mesh cubeMesh;
 	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
 	cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+
 	Light light(&simpleShader);
 
 	Model simpleModel(cubeMesh, simpleShader);
@@ -105,6 +106,8 @@ int main()
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 lsmodel = glm::mat4(1.0f);
 
+	static float isoLevel = 1.6;
+	float oldIsoLevel = isoLevel;
 	// render loop
    // -----------
 	while (!window.getShouldClose())
@@ -146,6 +149,11 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
+		if (oldIsoLevel != isoLevel) {
+			mesh = mc.updateIsoLevel(isoLevel);
+			cubeMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+		}
+
 		//Draw simple cube
 		simpleModel.shader.useLsMVP(lsmodel, view, projection);
 		// light properties
@@ -157,6 +165,7 @@ int main()
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
+		oldIsoLevel = isoLevel;
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
 
@@ -164,6 +173,8 @@ int main()
 			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+
+			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
 		}

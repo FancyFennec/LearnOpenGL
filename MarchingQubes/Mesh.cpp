@@ -4,6 +4,7 @@ Mesh::Mesh()
 {
 	VAO = 0;
 	VBO = 0;
+	numOfVertices = 0;
 }
 
 void Mesh::CreateMesh(float *vertices, unsigned int numOfVertices)

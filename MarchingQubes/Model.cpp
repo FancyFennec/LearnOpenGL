@@ -11,7 +11,8 @@ Model::Model(Mesh& mesh, Shader& shader) :
 }
 
 Model::Model(Shader& shader) :
-	shader(shader)
+	shader(shader),
+	mesh(Mesh())
 {
 	shader.use();
 	shininess = 32;
@@ -68,7 +69,6 @@ void Model::useCubeMesh()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.2f, 0.3f
 	};
 
-	mesh = Mesh();
 	mesh.CreateMesh(vertices, 36);
 }
 

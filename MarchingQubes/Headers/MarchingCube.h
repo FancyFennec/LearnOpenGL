@@ -24,7 +24,7 @@ private:
 	float* booleanField;
 	int m; 
 	int n; 
-	int k;
+	int l;
 };
 	
 
@@ -64,7 +64,7 @@ inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m,
 	this->booleanField = booleanField;
 	this->m = m;
 	this->n = n;
-	this->k = l;
+	this->l = l;
 
 	float isoLevel = 0.65f;
 	std::vector<float> mesh = {};
@@ -110,12 +110,12 @@ inline std::vector<float> MarchingCube::generateMesh(float* booleanField, int m,
 	return mesh;
 }
 
-inline std::vector<float> MarchingCube::updateIsoLevel(float & isoLevel)
+inline std::vector<float> MarchingCube::updateIsoLevel(float& isoLevel)
 {
 	std::vector<float> mesh = {};
 
 #pragma omp parallel for
-	for (int l = 0; l < k - 1; l++) {
+	for (int k = 0; k < l - 1; k++) {
 		for (int j = 0; j < n - 1; j++) {
 			for (int i = 0; i < m - 1; i++) {
 				int lookUpindex = 0;
