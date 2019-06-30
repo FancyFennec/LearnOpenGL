@@ -63,30 +63,30 @@ int main()
 	// build and compile our shader program
 	// ------------------------------------
 	Shader lampShader("Shaders/lampShader.vs", "Shaders/lampShader.fs");
-	Shader simpleShader("Shaders/simpleShader.vs", "Shaders/simpleShader.fs");
+	Shader terrainShader("Shaders/terrainShader.vs", "Shaders/terrainShader.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
    // ------------------------------------------------------------------
 
 	Mesh cubeMesh;
 	cubeMesh.CreateCubeMesh();
-	Light light(&simpleShader);
+	Light light(&terrainShader);
 	Model lampModel(cubeMesh, lampShader);
 
 	int x = 100, y = 100;
 	Terrain terrain(x, y);
 	Mesh terrainMesh;
 
-	static float h = 1.0f;
+	static float h = 1.4f;
 	static float f = 3.0f;
-	static int o = 4;
-	static float p = 0.2f;
+	static int o = 6;
+	static float p = 0.4f;
 
 	float oldValues = h + f + o + p;
 
 	terrain.generateTerrain(h, f, o, p);
 	terrainMesh.CreateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
-	Model terrainModel(terrainMesh, simpleShader);
+	Model terrainModel(terrainMesh, terrainShader);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -163,7 +163,7 @@ int main()
 
 			ImGui::SliderFloat("Height", &h, 0.0f, 5.0f);
 			ImGui::SliderFloat("Frequency", &f, 0.0f, 5.0f);
-			ImGui::SliderInt("Octaves", &o, 0, 6);
+			ImGui::SliderInt("Octaves", &o, 0, 10);
 			ImGui::SliderFloat("Presistence", &p, 0.0f, 2.0f);
 
 			ImGui::End();

@@ -7,6 +7,7 @@ Terrain::Terrain(int width, int height)
 	this->width = width;
 	this->height = height;
 	this->pNoise = PerlinNoise(4);
+	terrainColour = glm::vec3(0.3f, 0.15f, 0.05f);
 }
 
 Terrain::~Terrain()
@@ -70,16 +71,16 @@ void Terrain::addPointToMesh(glm::vec3 v)
 void  Terrain::addTriangleToMesh(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3)
 {
 	glm::vec3 n = glm::normalize(glm::cross(v1 - v2, v3 - v1));
-
+	
 	addPointToMesh(v1);
 	addPointToMesh(n);
-	addPointToMesh(glm::vec3(1.0f));
+	addPointToMesh(terrainColour);
 
 	addPointToMesh(v2);
 	addPointToMesh(n);
-	addPointToMesh(glm::vec3(1.0f));
+	addPointToMesh(terrainColour);
 
 	addPointToMesh(v3);
 	addPointToMesh(n);
-	addPointToMesh(glm::vec3(1.0f));
+	addPointToMesh(terrainColour);
 }

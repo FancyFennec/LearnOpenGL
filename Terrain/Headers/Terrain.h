@@ -10,6 +10,7 @@ public:
 	~Terrain();
 
 	int width, height;
+	glm::vec3 terrainColour;
 	
 	std::vector<float> heightMap;
 	std::vector<float> vertices;

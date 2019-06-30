@@ -128,11 +128,16 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lampShader.fs" />
     <None Include="Shaders\lampShader.vs" />
     <None Include="Shaders\simpleShader.fs" />
     <None Include="Shaders\simpleShader.vs" />
+    <None Include="Shaders\terrainShader.fs" />
+    <None Include="Shaders\terrainShader.vs" />
   </ItemGroup>
 </Project>
