@@ -190,7 +190,6 @@
     <ClInclude Include="Headers\Tables.h" />
     <ClInclude Include="Headers\pNoise.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lampShader.fs" />

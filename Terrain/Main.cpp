@@ -75,9 +75,16 @@ int main()
 
 	int x = 100, y = 100;
 	Terrain terrain(x, y);
-	terrain.generateTerrain();
-
 	Mesh terrainMesh;
+
+	static float h = 1.0f;
+	static float f = 3.0f;
+	static int o = 4;
+	static float p = 0.2f;
+
+	float oldValues = h + f + o + p;
+
+	terrain.generateTerrain(h, f, o, p);
 	terrainMesh.CreateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
 	Model terrainModel(terrainMesh, simpleShader);
 
@@ -128,11 +135,12 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		/*if (oldIsoLevel != isoLevel) {
-			mesh = mc.updateIsoLevel(isoLevel);
-			perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
-		}*/
+		if (h + f + o + p != oldValues) {
+			terrain.generateTerrain(h, f, o, p);
+			terrainMesh.CreateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
+		}
 
+		oldValues = h + f + o + p;
 		
 		//Draw simple cube
 		terrainModel.shader.useLsMVP(lsmodel, view, projection);
@@ -140,7 +148,7 @@ int main()
 		light.updateShader();
 		terrainModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-0.5, -1, -3));
+		model = glm::translate(model, glm::vec3(-2, -1, -6));
 		model = glm::scale(model, glm::vec3(4 / ((float)x), 1, 4 / ((float)y)));
 		terrainModel.shader.setMat4("model", model);
 		terrainModel.renderModel();
@@ -149,9 +157,14 @@ int main()
 		{
 
 			ImGui::Begin("Chose iso level");                  
-			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f); 
+			/*ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f); 
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
-			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
+			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);*/
+
+			ImGui::SliderFloat("Height", &h, 0.0f, 5.0f);
+			ImGui::SliderFloat("Frequency", &f, 0.0f, 5.0f);
+			ImGui::SliderInt("Octaves", &o, 0, 6);
+			ImGui::SliderFloat("Presistence", &p, 0.0f, 2.0f);
 
 			ImGui::End();
 		}

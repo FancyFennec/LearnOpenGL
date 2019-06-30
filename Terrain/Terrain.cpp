@@ -13,26 +13,25 @@ Terrain::~Terrain()
 {
 }
 
-void Terrain::generateHeightMap()
+void Terrain::generateHeightMap(float &elevation, float &frequency, unsigned int &octaves, float &persistence)
 {
 	heightMap = {};
 
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
-			heightMap.push_back(pNoise.noise(
-				3 * (double)i / ((double)width),
-				3 * (double)j / ((double)height),
-				0
-			));
+			heightMap.push_back(
+				elevation * pNoise.octavePerlin(frequency * (double)i / ((double)width), frequency * (double)j / ((double)height), 0, octaves, persistence)
+			);
 		}
 	}
 }
 
-void Terrain::generateTerrain()
+void Terrain::generateTerrain(float elevation, float frequency, unsigned int octaves, float persistence)
 {
-	std::vector<glm::vec3> points;
+	vertices = {};
+	std::vector<glm::vec3> points = {};
 
-	generateHeightMap();
+	generateHeightMap(elevation, frequency, octaves, persistence);
 
 	for (int j = 0; j < height - 1; j++) {
 		for (int i = 0; i < width - 1; i++) {
