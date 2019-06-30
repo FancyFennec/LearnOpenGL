@@ -7,7 +7,6 @@
 #include "Headers/Model.h"
 #include "Headers/Light.h"
 #include "Headers/MarchingCube.h"
-#include "Headers/pNoise.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -18,7 +17,6 @@ void updateDeltaTime();
 const char* glsl_version = "#version 130";
 // camera
 Window window(Camera(glm::vec3(0.0f, 0.0f, 3.0f)), SCR_WIDTH, SCR_HEIGHT);
-PerlinNoise pNoise = PerlinNoise(4);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -71,30 +69,14 @@ int main()
 	
 	MarchingCube mc;
 	int x = 30, y = 30, z = 30;
-
-	std::vector<float> gridValues = {};
-#pragma omp parallel for
-	for (int i = -1; i < x + 1; ++i) {
-		for (int j = -1; j < y + 1; ++j) {
-			for (int k = -1; k < z + 1; ++k) {
-				if (i == -1 || j == -1 || k == -1 || i == x || j == y || k == z) {
-					gridValues.push_back(0);
-				} else {
-					gridValues.push_back((float)pNoise.noise(
-						3 * (double)i / ((double)x),
-						3 * (double)j / ((double)y),
-						3 * (double)k / ((double)z)));
-				}
-				
-			}
-		}
-	}
+	
+	std::vector<float> mesh = mc.generatePerlinMesh(x, y, z);
 
 	Mesh cubeMesh;
 	cubeMesh.CreateCubeMesh();
 
 	Mesh perlinMesh;
-	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
+	
 	perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
 
 	Light light(&simpleShader);
@@ -147,7 +129,6 @@ int main()
 		light.setPosition(lightPos);
 		light.setViewPos(window.getCamera().Position);
 
-		//TODO: Lamp is not being rendered correctly
 		//draw the lamp object
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
@@ -177,8 +158,8 @@ int main()
 			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			//ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
-			ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
+			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
+			//ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
 		}
