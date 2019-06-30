@@ -9,6 +9,7 @@ public:
 	Mesh();
 
 	void CreateMesh(float *vertices, unsigned int numOfVertices);
+	void CreateCubeMesh();
 	void RenderMesh();
 	void ClearMesh();
 

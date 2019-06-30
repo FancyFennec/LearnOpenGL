@@ -90,6 +90,9 @@ int main()
 		}
 	}
 
+	Mesh cubeMesh;
+	cubeMesh.CreateCubeMesh();
+
 	Mesh perlinMesh;
 	std::vector<float> mesh = mc.generateMesh(gridValues.data(), x + 2, y + 2, z + 2);
 	perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
@@ -97,7 +100,7 @@ int main()
 	Light light(&simpleShader);
 
 	Model simpleModel(perlinMesh, simpleShader);
-	Model lampModel(lampShader);
+	Model lampModel(cubeMesh, lampShader);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -174,7 +177,8 @@ int main()
 			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
+			//ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
+			ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
 		}

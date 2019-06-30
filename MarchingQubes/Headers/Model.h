@@ -10,7 +10,6 @@ class Model
 {
 public:
 	Model(Mesh& mesh, Shader& shader);
-	Model(Shader& shader);
 	~Model();
 
 	void renderModel() { mesh.RenderMesh(); };
