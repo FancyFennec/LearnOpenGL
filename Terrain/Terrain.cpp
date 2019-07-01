@@ -54,9 +54,9 @@ void Terrain::setMeshCoordinates()
 			addPointToMesh(getMeshIndex(i, j) + 9 * 1, v2);
 			addPointToMesh(getMeshIndex(i, j) + 9 * 2, v3);
 
-			addPointToMesh(getIndex(i, j) + 9 * 3, v1);
-			addPointToMesh(getIndex(i, j) + 9 * 4, v3);
-			addPointToMesh(getIndex(i, j) + 9 * 5, v4);
+			addPointToMesh(getMeshIndex(i, j) + 9 * 3, v1);
+			addPointToMesh(getMeshIndex(i, j) + 9 * 4, v3);
+			addPointToMesh(getMeshIndex(i, j) + 9 * 5, v4);
 		}
 	}
 }
@@ -105,15 +105,15 @@ void Terrain::addPointToMesh(int offset, glm::vec3 v)
 void  Terrain::setHeightInMesh(int i, int j, float h1, float h2, float h3, float h4)
 {
 	glm::vec3 n1 = glm::normalize(glm::cross(glm::vec3(-1 , h1 - h2, 0), glm::vec3(1, h3 - h1, 1)));
-	glm::vec3 n2 = glm::normalize(glm::cross(glm::vec3(0, h4 - h1, -1), glm::vec3(-1, h3 - h4, 0)));
+	glm::vec3 n2 = glm::normalize(glm::cross(glm::vec3(0, h4 - h1, 1), glm::vec3(1, h3 - h4, 0)));
 	
 	vertices[getMeshIndex(i, j) + 9 * 0 + 1] = h1;
 	vertices[getMeshIndex(i, j) + 9 * 1 + 1] = h2;
 	vertices[getMeshIndex(i, j) + 9 * 2 + 1] = h3;
 
-	vertices[getMeshIndex(i, j) + 9 * 3 + 1] = h3;
-	vertices[getMeshIndex(i, j) + 9 * 4 + 1] = h4;
-	vertices[getMeshIndex(i, j) + 9 * 5 + 1] = h1;
+	vertices[getMeshIndex(i, j) + 9 * 3 + 1] = h1;
+	vertices[getMeshIndex(i, j) + 9 * 4 + 1] = h3;
+	vertices[getMeshIndex(i, j) + 9 * 5 + 1] = h4;
 
 	addPointToMesh(getMeshIndex(i, j) + 9 * 0 + 3, n1);
 	addPointToMesh(getMeshIndex(i, j) + 9 * 1 + 3, n1);
