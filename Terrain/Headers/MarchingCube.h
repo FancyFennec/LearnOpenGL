@@ -112,7 +112,7 @@ inline std::vector<float> MarchingCube::generateMesh(std::vector<float> &field, 
 				lookUpindex |= valueField[getIndex(i + 1, j    , k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
 				lookUpindex |= valueField[getIndex(i    , j    , k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
 
-				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
+				for (size_t x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
 
 					mesh.push_back(lookupMesh[lookUpindex].data()[x] + i);
 					mesh.push_back(lookupMesh[lookUpindex].data()[x + 1] - k);
@@ -157,7 +157,7 @@ inline std::vector<float> MarchingCube::updateIsoLevel(float& isoLevel)
 				lookUpindex |= valueField[getIndex(i + 1, j, k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
 				lookUpindex |= valueField[getIndex(i, j, k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
 
-				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
+				for (size_t x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
 
 					mesh.push_back(lookupMesh[lookUpindex].data()[x] + i);
 					mesh.push_back(lookupMesh[lookUpindex].data()[x + 1] - k);

@@ -22,7 +22,7 @@ Terrain::~Terrain()
 
 void Terrain::setMeshColour()
 {
-	for (int offset = 0; offset < vertices.size(); offset += 9) {
+	for (size_t offset = 0; offset < vertices.size(); offset += 9) {
 		addPointToMesh(offset + 6, terrainColour);
 	}
 }
@@ -66,7 +66,7 @@ void Terrain::generateHeightMap(float &elevation, float &frequency, unsigned int
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
 			heightMap[getIndex(i, j)] =
-				elevation * pNoise.octavePerlin(
+				elevation * (float) pNoise.octavePerlin(
 					frequency * (double)i / ((double)width),
 					frequency * (double)j / ((double)height),
 					0,
@@ -95,17 +95,17 @@ void Terrain::generateTerrain(float elevation, float frequency, unsigned int oct
 	}
 }
 
-void Terrain::addPointToMesh(int offset, glm::vec3 v)
+void Terrain::addPointToMesh(int offset, glm::vec3 &v)
 {
 	vertices[offset] = v.x;
 	vertices[offset + 1] = v.y;
 	vertices[offset + 2] = v.z;
 }
 
-void  Terrain::setHeightInMesh(int i, int j, float h1, float h2, float h3, float h4)
+void  Terrain::setHeightInMesh(int i, int j, float &h1, float &h2, float &h3, float &h4)
 {
-	glm::vec3 n1 = glm::normalize(glm::cross(glm::vec3(-1 , h1 - h2, 0), glm::vec3(1, h3 - h1, 1)));
-	glm::vec3 n2 = glm::normalize(glm::cross(glm::vec3(0, h4 - h1, 1), glm::vec3(1, h3 - h4, 0)));
+	glm::vec3 n1 = glm::normalize(glm::vec3(h1 - h2, 1, h2 - h3)); //Hard coded  vector product magic
+	glm::vec3 n2 = glm::normalize(glm::vec3(h4 - h3, 1, h1 - h4));
 	
 	vertices[getMeshIndex(i, j) + 9 * 0 + 1] = h1;
 	vertices[getMeshIndex(i, j) + 9 * 1 + 1] = h2;

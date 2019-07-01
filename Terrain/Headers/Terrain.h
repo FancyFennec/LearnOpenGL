@@ -26,7 +26,7 @@ private:
 	void setMeshColour();
 	void setMeshCoordinates();
 	void generateHeightMap(float &elevation, float &frequency, unsigned int &octaves, float &persistence);
-	void setHeightInMesh(int i, int j, float h1, float h2, float h3, float h4);
-	void addPointToMesh(int offset, glm::vec3 v);
+	void setHeightInMesh(int i, int j, float &h1, float &h2, float &h3, float &h4);
+	void addPointToMesh(int offset, glm::vec3 &v);
 };
 
