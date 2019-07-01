@@ -73,7 +73,7 @@ int main()
 	Light light(&terrainShader);
 	Model lampModel(cubeMesh, lampShader);
 
-	int x = 100, y = 100;
+	int x = 300, y = 300;
 	Terrain terrain(x, y);
 	Mesh terrainMesh;
 
@@ -137,7 +137,7 @@ int main()
 
 		if (h + f + o + p != oldValues) {
 			terrain.generateTerrain(h, f, o, p);
-			terrainMesh.CreateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
+			terrainMesh.UpdateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
 		}
 
 		oldValues = h + f + o + p;
