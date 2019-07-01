@@ -8,6 +8,8 @@ Terrain::Terrain(int width, int height)
 	this->height = height;
 	this->pNoise = PerlinNoise(4);
 	terrainColour = glm::vec3(0.3f, 0.15f, 0.05f);
+
+	heightMap.resize(width * height);
 }
 
 Terrain::~Terrain()
@@ -16,13 +18,15 @@ Terrain::~Terrain()
 
 void Terrain::generateHeightMap(float &elevation, float &frequency, unsigned int &octaves, float &persistence)
 {
-	heightMap = {};
-
 	for (int j = 0; j < height; j++) {
 		for (int i = 0; i < width; i++) {
-			heightMap.push_back(
-				elevation * pNoise.octavePerlin(frequency * (double)i / ((double)width), frequency * (double)j / ((double)height), 0, octaves, persistence)
-			);
+			heightMap[getIndex(i, j)] =
+				elevation * pNoise.octavePerlin(
+					frequency * (double)i / ((double)width),
+					frequency * (double)j / ((double)height),
+					0,
+					octaves,
+					persistence);
 		}
 	}
 }

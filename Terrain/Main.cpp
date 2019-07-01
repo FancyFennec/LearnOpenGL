@@ -94,9 +94,9 @@ int main()
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 lsmodel = glm::mat4(1.0f);
 
-	static float a = 0.15f;
-	static float d = 0.4f;
-	static float s = 0.1f;
+	static float a = 0.4f;
+	static float d = 1.0f;
+	static float s = 0.25f;
 
 	// render loop
    // -----------
@@ -157,9 +157,9 @@ int main()
 		{
 
 			ImGui::Begin("Chose iso level");                  
-			/*ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f); 
+			ImGui::SliderFloat("Ambient", &a, 0.0f, 1.0f); 
 			ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
-			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);*/
+			ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
 			ImGui::SliderFloat("Height", &h, 0.0f, 5.0f);
 			ImGui::SliderFloat("Frequency", &f, 0.0f, 5.0f);
