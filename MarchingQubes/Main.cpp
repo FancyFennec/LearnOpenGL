@@ -68,7 +68,7 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc;
-	int x = 30, y = 30, z = 30;
+	int x = 100, y = 100, z = 100;
 	
 	std::vector<float> mesh = mc.generatePerlinMesh(x, y, z);
 
