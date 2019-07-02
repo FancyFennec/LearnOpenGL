@@ -11,9 +11,11 @@ public:
 	unsigned int width, height;
 	std::vector<float> &heightMap;
 
-	float xPos;
-	float yPos;
-	std::vector<float> gradient = { 0, 0 };
+	std::vector<float> pos;
+	std::vector<float> oldPos;
+
+	std::vector<float> grad = { 0, 0 };
+	std::vector<float> dir = { 0, 0 };
 
 	float p_inertia = 0.1f;
 	float p_minSlope = 0.1f;
@@ -31,10 +33,30 @@ public:
 	void setEvaporation(float evaporation) { p_evaporation = evaporation; };
 	void setGravity(float gravity) { p_gravity = gravity; };
 
+	int computeStep();
+
 private:
+	float water = 1.0f; // maybe put this into the constructor
+
+	float terrain_height;
+	float terrain_height_diff;
+	float vel = 0.0f;
+	float sediment = 0.0f;
+	float capacity = 0.0f;
+
+	template <class T>
+	float min(T a, T b) { return a < b ? a : b; };
+	template <class T>
+	float max(T a, T b) { return a > b ? a : b; };
 	int getIndex(int i, int j) { return j * width + i; };
 
 	void computeGradient();
-	void computeStep();
+	void computeDirection();
+	void computePosition();
+	void computeHeight();
+	void computeCapacity();
+	void computeErosionStep();
+	void computeVelocity();
+	void computeWater();
 };
 
