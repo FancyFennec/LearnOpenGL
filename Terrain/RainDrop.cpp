@@ -7,7 +7,7 @@ RainDrop::RainDrop(int width, int height, std::vector<float>& heightMap) :
 	heightMap(heightMap)
 {
 	pos[0] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)width));
-	//pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)height));
+	pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)height));
 }
 
 
@@ -66,6 +66,7 @@ void RainDrop::computeHeight()
 	newHeight /= 4.0f;
 
 	terrain_height_diff = newHeight - terrain_height;
+	terrain_height_diff = terrain_height_diff > 0 ? terrain_height_diff : - terrain_height_diff;
 	terrain_height = newHeight;
 }
 
@@ -76,23 +77,25 @@ void RainDrop::computeCapacity()
 
 void RainDrop::computeErosionStep()
 {
-	int xPos, yPos;
 
 	if (sediment > capacity) {
-		xPos = oldPos[0] - std::floorf(oldPos[0]) < std::ceilf(oldPos[0]) - oldPos[0] ?
-			std::floorf(oldPos[0]) : std::ceilf(oldPos[0]);
-		yPos = oldPos[1] - std::floorf(oldPos[1]) < std::ceilf(oldPos[1]) - oldPos[1] ?
-			std::floorf(oldPos[1]) : std::ceilf(oldPos[1]);
+		float deposed_sediment = (sediment - capacity) * p_deposition / 4.0f;
 
-		heightMap[getIndex(xPos, yPos)] += (sediment - capacity) * p_deposition;
-	}
-	else {
-		xPos = pos[0] - std::floorf(pos[0]) < std::ceilf(pos[0]) - pos[0] ?
-			std::floorf(pos[0]) : std::ceilf(oldPos[0]);
-		yPos = pos[1] - std::floorf(pos[1]) < std::ceilf(pos[1]) - pos[1] ?
-			std::floorf(pos[1]) : std::ceilf(pos[1]);
+		heightMap[getIndex(std::floorf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::floorf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::ceilf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::ceilf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
 
-		heightMap[getIndex(xPos, yPos)] -= min((capacity - sediment) * p_erosion, -terrain_height_diff);
+		sediment -= deposed_sediment;
+	} else {
+		float eroded_sediment = min((capacity - sediment) * p_erosion, terrain_height_diff) / 4.0f;
+
+		heightMap[getIndex(std::floorf(oldPos[0]), std::floorf(oldPos[1]))] -= eroded_sediment;
+		heightMap[getIndex(std::floorf(oldPos[0]), std::ceilf(oldPos[1]))] -= eroded_sediment;
+		heightMap[getIndex(std::ceilf(oldPos[0]), std::floorf(oldPos[1]))] -= eroded_sediment;
+		heightMap[getIndex(std::ceilf(oldPos[0]), std::ceilf(oldPos[1]))] -= eroded_sediment;
+
+		sediment += eroded_sediment;
 	}
 }
 
@@ -111,7 +114,7 @@ int RainDrop::computeStep()
 	computeGradient();
 	computeDirection();
 	computePosition();
-	if (pos[0] < 0 || pos[0] > width || pos[1] < 0 || pos[1] >height) {
+	if (pos[0] < 0 || pos[0] > width || pos[1] < 0 || pos[1] > height) {
 		return 0;
 	}
 	computeHeight();

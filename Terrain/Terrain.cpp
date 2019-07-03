@@ -80,6 +80,23 @@ void Terrain::generateTerrain(float elevation, float frequency, unsigned int oct
 	}
 }
 
+void Terrain::updateTerrain()
+{
+	for (int j = 0; j < height - 1; j++) {
+		for (int i = 0; i < width - 1; i++) {
+
+			float h1, h2, h3, h4;
+
+			h1 = heightMap[getIndex(i, j)];
+			h2 = heightMap[getIndex(i + 1, j)];
+			h3 = heightMap[getIndex(i + 1, j + 1)];
+			h4 = heightMap[getIndex(i, j + 1)];
+
+			setHeightInMesh(i, j, h1, h2, h3, h4);
+		}
+	}
+}
+
 void Terrain::addPointToMesh(int offset, glm::vec3 &v)
 {
 	vertices[offset] = v.x;

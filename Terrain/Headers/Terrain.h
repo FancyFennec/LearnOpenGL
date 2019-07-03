@@ -16,6 +16,7 @@ public:
 	std::vector<float> vertices;
 
 	void generateTerrain(float elevation, float frequency, unsigned int octaves, float persistence);
+	void updateTerrain();
 
 private:
 	PerlinNoise pNoise;
