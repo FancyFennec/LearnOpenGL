@@ -1,18 +1,18 @@
 #pragma once
 
 #include <vector>
-#include <random>
+
 class RainDrop
 {
 public:
-	RainDrop(unsigned int width, unsigned int height, std::vector<float> &heightMap);
+	RainDrop(int width, int height, std::vector<float>& heightMap);
 	~RainDrop();
 
-	unsigned int width, height;
-	std::vector<float> &heightMap;
+	int width, height;
+	std::vector<float>& heightMap;
 
-	std::vector<float> pos;
-	std::vector<float> oldPos;
+	std::vector<float> pos = { 0, 0 };
+	std::vector<float> oldPos = { 0, 0 };
 
 	std::vector<float> grad = { 0, 0 };
 	std::vector<float> dir = { 0, 0 };

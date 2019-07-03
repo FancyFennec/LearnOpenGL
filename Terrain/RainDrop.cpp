@@ -1,12 +1,13 @@
 #include "RainDrop.h"
 
-RainDrop::RainDrop(unsigned int width, unsigned int height, std::vector<float> &heightMap) :
+
+RainDrop::RainDrop(int width, int height, std::vector<float>& heightMap) :
 	width(width),
 	height(height),
 	heightMap(heightMap)
 {
-	pos[0] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float) width));
-	pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float) height));
+	pos[0] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)width));
+	//pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)height));
 }
 
 
@@ -23,7 +24,7 @@ void RainDrop::computeGradient()
 
 	float u = pos[0] - p_x;
 	float v = pos[1] - p_y;
-	
+
 	grad[0] = (heightMap[getIndex(p_x1, p_y)] - heightMap[getIndex(p_x, p_y)]) * (1 - v)
 		+ (heightMap[getIndex(p_x1, p_y1)] - heightMap[getIndex(p_x, p_y1)]) * v;
 	grad[1] = (heightMap[getIndex(p_x, p_y1)] - heightMap[getIndex(p_x, p_y)]) * (1 - u)
@@ -78,13 +79,14 @@ void RainDrop::computeErosionStep()
 	int xPos, yPos;
 
 	if (sediment > capacity) {
-		xPos = oldPos[0] - std::floorf(oldPos[0]) < std::ceilf(oldPos[0]) - oldPos[0] ? 
+		xPos = oldPos[0] - std::floorf(oldPos[0]) < std::ceilf(oldPos[0]) - oldPos[0] ?
 			std::floorf(oldPos[0]) : std::ceilf(oldPos[0]);
-		yPos = oldPos[1] - std::floorf(oldPos[1]) < std::ceilf(oldPos[1]) - oldPos[1] ? 
+		yPos = oldPos[1] - std::floorf(oldPos[1]) < std::ceilf(oldPos[1]) - oldPos[1] ?
 			std::floorf(oldPos[1]) : std::ceilf(oldPos[1]);
 
 		heightMap[getIndex(xPos, yPos)] += (sediment - capacity) * p_deposition;
-	} else {
+	}
+	else {
 		xPos = pos[0] - std::floorf(pos[0]) < std::ceilf(pos[0]) - pos[0] ?
 			std::floorf(pos[0]) : std::ceilf(oldPos[0]);
 		yPos = pos[1] - std::floorf(pos[1]) < std::ceilf(pos[1]) - pos[1] ?
@@ -117,8 +119,6 @@ int RainDrop::computeStep()
 	computeErosionStep();
 	computeVelocity();
 	computeWater();
-	
+
 	return 1;
 }
-
-

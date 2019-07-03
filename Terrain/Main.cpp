@@ -8,6 +8,7 @@
 #include "Headers/Light.h"
 #include "Headers/MarchingCube.h"
 #include "Headers/Terrain.h"
+#include "RainDrop.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_glfw.h"
@@ -85,6 +86,7 @@ int main()
 	float oldValues = h + f + o + p;
 
 	terrain.generateTerrain(h, f, o, p);
+
 	terrainMesh.CreateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
 	Model terrainModel(terrainMesh, terrainShader);
 
@@ -165,6 +167,23 @@ int main()
 			ImGui::SliderFloat("Frequency", &f, 0.0f, 5.0f);
 			ImGui::SliderInt("Octaves", &o, 0, 10);
 			ImGui::SliderFloat("Presistence", &p, 0.0f, 2.0f);
+
+			if (ImGui::Button("Erosion")) {
+				std::vector<RainDrop> drops = {};
+				for (int i = 0; i < 1000; i++) {
+					drops.push_back(RainDrop(300, 300, terrain.heightMap));
+				}
+
+				for (RainDrop drop : drops) {
+					int i = 0;
+					int maxSteps = 10000;
+					while (drop.computeStep() && i < maxSteps) {
+						i++;
+					}
+				}
+
+				terrainMesh.UpdateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
+			}
 
 			ImGui::End();
 		}
