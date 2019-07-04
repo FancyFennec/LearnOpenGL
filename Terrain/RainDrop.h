@@ -17,12 +17,12 @@ public:
 	std::vector<float> grad = { 0, 0 };
 	std::vector<float> dir = { 0, 0 };
 
-	float p_inertia = 0.1f;
-	float p_minSlope = 0.1f;
+	float p_inertia = 0.5f;
+	float p_minSlope = 0.01f;
 	float p_capacity = 0.1f;
-	float p_deposition = 0.1f;
-	float p_erosion = 0.1f;
-	float p_evaporation = 0.1f;
+	float p_deposition = 0.05f;
+	float p_erosion = 0.05f;
+	float p_evaporation = 0.001f;
 	float p_gravity = 9.81f;
 
 	void setInertia(float inertia) { p_inertia = inertia; };

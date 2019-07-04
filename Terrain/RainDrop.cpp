@@ -17,14 +17,6 @@ RainDrop::~RainDrop()
 
 void RainDrop::computeGradient()
 {
-	/*std::cout << '\n' << pos[0];
-	std::cout << '\n' << std::floorf(pos[0]);
-	std::cout << '\n' << std::ceilf(pos[0]);
-	std::cout << '\n' << pos[1];
-	std::cout << '\n' << std::floorf(pos[1]);
-	std::cout << '\n' << std::ceilf(pos[1]);
-	std::cout << '\n' << heightMap.size();*/
-
 	int p_x = std::floorf(pos[0]);
 	int p_x1 = std::ceilf(pos[0]);
 	int p_y = std::floorf(pos[1]);
@@ -76,7 +68,6 @@ void RainDrop::computeHeight()
 	newHeight /= 4.0f;
 
 	terrain_height_diff = newHeight - terrain_height;
-	terrain_height_diff = terrain_height_diff > 0 ? terrain_height_diff : - terrain_height_diff;
 	terrain_height = newHeight;
 }
 
@@ -87,25 +78,38 @@ void RainDrop::computeCapacity()
 
 void RainDrop::computeErosionStep()
 {
+	if (terrain_height_diff > 0) {
+		float deposed_sediment = sediment / 4.0f;
 
-	if (sediment > capacity) {
-		float deposed_sediment = (sediment - capacity) * p_deposition / 4.0f;
+		heightMap[getIndex(std::floorf(oldPos[0]), std::floorf(oldPos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::floorf(oldPos[0]), std::ceilf(oldPos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::ceilf(oldPos[0]), std::floorf(oldPos[1]))] += deposed_sediment;
+		heightMap[getIndex(std::ceilf(oldPos[0]), std::ceilf(oldPos[1]))] += deposed_sediment;
 
-		heightMap[getIndex(std::floorf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
-		heightMap[getIndex(std::floorf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
-		heightMap[getIndex(std::ceilf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
-		heightMap[getIndex(std::ceilf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
-
-		sediment -= deposed_sediment;
+		sediment = 0;
 	} else {
-		float eroded_sediment = min((capacity - sediment) * p_erosion, terrain_height_diff) / 4.0f;
+		computeCapacity();
 
-		heightMap[getIndex(std::floorf(oldPos[0]), std::floorf(oldPos[1]))] -= eroded_sediment;
-		heightMap[getIndex(std::floorf(oldPos[0]), std::ceilf(oldPos[1]))] -= eroded_sediment;
-		heightMap[getIndex(std::ceilf(oldPos[0]), std::floorf(oldPos[1]))] -= eroded_sediment;
-		heightMap[getIndex(std::ceilf(oldPos[0]), std::ceilf(oldPos[1]))] -= eroded_sediment;
+		if (sediment > capacity) {
+			float deposed_sediment = (sediment - capacity) * p_deposition / 4.0f;
 
-		sediment += eroded_sediment;
+			heightMap[getIndex(std::floorf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
+			heightMap[getIndex(std::floorf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
+			heightMap[getIndex(std::ceilf(pos[0]), std::floorf(pos[1]))] += deposed_sediment;
+			heightMap[getIndex(std::ceilf(pos[0]), std::ceilf(pos[1]))] += deposed_sediment;
+
+			sediment -= deposed_sediment;
+		}
+		else {
+			float eroded_sediment = min((capacity - sediment) * p_erosion, -terrain_height_diff) / 4.0f;
+
+			heightMap[getIndex(std::floorf(pos[0]), std::floorf(pos[1]))] -= eroded_sediment;
+			heightMap[getIndex(std::floorf(pos[0]), std::ceilf(pos[1]))] -= eroded_sediment;
+			heightMap[getIndex(std::ceilf(pos[0]), std::floorf(pos[1]))] -= eroded_sediment;
+			heightMap[getIndex(std::ceilf(pos[0]), std::ceilf(pos[1]))] -= eroded_sediment;
+
+			sediment += eroded_sediment;
+		}
 	}
 }
 
@@ -128,7 +132,6 @@ int RainDrop::computeStep()
 		return 0;
 	}
 	computeHeight();
-	computeCapacity();
 	computeErosionStep();
 	computeVelocity();
 	computeWater();
