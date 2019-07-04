@@ -170,13 +170,14 @@ int main()
 
 			if (ImGui::Button("Erosion")) {
 				std::vector<RainDrop> drops = {};
-				for (int i = 0; i < 2; i++) {
+				drops.reserve(10000);
+				for (int i = 0; i < 10000; i++) {
 					drops.push_back(RainDrop(x, y, terrain.heightMap));
 				}
 
 				for (RainDrop drop : drops) {
 					int i = 0;
-					int maxSteps = 10;
+					int maxSteps = 1000;
 					while (drop.computeStep() && i < maxSteps) {
 						i++;
 					}

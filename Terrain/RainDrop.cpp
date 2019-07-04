@@ -1,13 +1,13 @@
 #include "RainDrop.h"
-
+#include <iostream>
 
 RainDrop::RainDrop(int width, int height, std::vector<float>& heightMap) :
 	width(width),
 	height(height),
 	heightMap(heightMap)
 {
-	pos[0] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)width));
-	pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float)height));
+	pos[0] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float) (width -1)));
+	pos[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (float) (height - 1)));
 }
 
 
@@ -17,6 +17,14 @@ RainDrop::~RainDrop()
 
 void RainDrop::computeGradient()
 {
+	/*std::cout << '\n' << pos[0];
+	std::cout << '\n' << std::floorf(pos[0]);
+	std::cout << '\n' << std::ceilf(pos[0]);
+	std::cout << '\n' << pos[1];
+	std::cout << '\n' << std::floorf(pos[1]);
+	std::cout << '\n' << std::ceilf(pos[1]);
+	std::cout << '\n' << heightMap.size();*/
+
 	int p_x = std::floorf(pos[0]);
 	int p_x1 = std::ceilf(pos[0]);
 	int p_y = std::floorf(pos[1]);
@@ -42,7 +50,7 @@ void RainDrop::computeDirection()
 		dir[1] = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
 	}
 
-	float norm = sqrt(dir[0] * dir[0] + dir[1] * dir[1]);
+	float norm = sqrtf(dir[0] * dir[0] + dir[1] * dir[1]);
 
 	dir[0] /= norm;
 	dir[1] /= norm;
@@ -51,7 +59,9 @@ void RainDrop::computeDirection()
 void RainDrop::computePosition()
 {
 	oldPos = pos;
-	pos[0] += dir[0]; pos[1] += dir[1];
+
+	pos[0] += dir[0]; 
+	pos[1] += dir[1];
 }
 
 void RainDrop::computeHeight()
@@ -114,7 +124,7 @@ int RainDrop::computeStep()
 	computeGradient();
 	computeDirection();
 	computePosition();
-	if (pos[0] < 0 || pos[0] > width || pos[1] < 0 || pos[1] > height) {
+	if (pos[0] < 0 || pos[0] > width - 1 || pos[1] < 0 || pos[1] > height - 1) {
 		return 0;
 	}
 	computeHeight();
