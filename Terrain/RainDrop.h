@@ -17,13 +17,13 @@ public:
 	std::vector<float> grad = { 0, 0 };
 	std::vector<float> dir = { 0, 0 };
 
-	float p_inertia = 1.0f;
+	float p_inertia = 0.1f;
 	float p_minSlope = 0.1f;
-	float p_capacity = 1.0f;
+	float p_capacity = 0.01f;
 	float p_deposition = 0.3f;
-	float p_erosion = 0.01f;
-	float p_evaporation = 0.001f;
-	float p_gravity = 10.0f;
+	float p_erosion = 0.6f;
+	float p_evaporation = 0.01f;
+	float p_gravity = 4.0f;
 
 	void setInertia(float inertia) { p_inertia = inertia; };
 	void setMinSlope(float minSlope) { p_minSlope = minSlope; };
@@ -36,11 +36,12 @@ public:
 	int computeStep();
 
 private:
-	float water = 1.0f; // maybe put this into the constructor
+	float water = 1.0f;
+	float vel = 1.0f;
 
 	float terrain_height;
 	float terrain_height_diff;
-	float vel = 0.0f;
+	
 	float sediment = 0.0f;
 	float capacity = 0.0f;
 
@@ -50,6 +51,7 @@ private:
 	float max(T a, T b) { return a > b ? a : b; };
 	int getIndex(int i, int j) { return j * width + i; };
 	void sortIndices(std::vector<int>& indices);
+	float norm(float x, float y) { return sqrt(x * x + y * y); };
 
 	void computeGradient();
 	void computeDirection();

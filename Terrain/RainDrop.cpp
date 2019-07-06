@@ -103,83 +103,85 @@ void RainDrop::computeErosionStep()
 	int posY = std::floorf(oldPos[1]);
 	int posY1 = std::ceilf(oldPos[1]);
 
-	if (terrain_height_diff > 0) {
-		float heightDiff = 0.0f;
+	computeCapacity();
+
+	if (terrain_height_diff > 0 || sediment > capacity) {
+
 		std::vector<int> indices = { posX, posY, posX1, posY, posX, posY1, posX1, posY1 };
 		sortIndices(indices);
 
-		if (heightMap[getIndex(indices[0], indices[1])] + sediment <=
+		float heightDiff = 0.0f;
+		float deposed_sediment = terrain_height_diff > 0 ? min(terrain_height_diff, sediment) : (sediment - capacity) * p_deposition;
+		sediment -= deposed_sediment;
+
+		if (heightMap[getIndex(indices[0], indices[1])] + deposed_sediment <=
 			heightMap[getIndex(indices[2], indices[3])]){
 
-			heightMap[getIndex(indices[0], indices[1])] += sediment;
-			sediment = 0;
+			heightMap[getIndex(indices[0], indices[1])] += deposed_sediment;
+
 		} else{
 			heightDiff = heightMap[getIndex(indices[2], indices[3])] - heightMap[getIndex(indices[0], indices[1])];
 			heightMap[getIndex(indices[0], indices[1])] += heightDiff;
-			sediment -= heightDiff;
+			deposed_sediment -= heightDiff;
 
-			if (heightMap[getIndex(indices[2], indices[3])] + sediment / 2.0f <=
+			if (heightMap[getIndex(indices[2], indices[3])] + deposed_sediment / 2.0f <=
 				heightMap[getIndex(indices[4], indices[5])]) {
 
-				heightMap[getIndex(indices[0], indices[1])] += sediment / 2.0f;
-				heightMap[getIndex(indices[2], indices[3])] += sediment / 2.0f;
-				sediment = 0;
+				heightMap[getIndex(indices[0], indices[1])] += deposed_sediment / 2.0f;
+				heightMap[getIndex(indices[2], indices[3])] += deposed_sediment / 2.0f;
+
 			} else {
 				heightDiff = heightMap[getIndex(indices[4], indices[5])] - heightMap[getIndex(indices[2], indices[3])];
 				heightMap[getIndex(indices[0], indices[1])] += heightDiff;
 				heightMap[getIndex(indices[2], indices[3])] += heightDiff;
-				sediment -= heightDiff * 2;
+				deposed_sediment -= heightDiff * 2;
 
-				if (heightMap[getIndex(indices[4], indices[5])] + sediment / 3.0f <=
+				if (heightMap[getIndex(indices[4], indices[5])] + deposed_sediment / 3.0f <=
 					heightMap[getIndex(indices[6], indices[7])]) {
 
-					heightMap[getIndex(indices[0], indices[1])] += sediment / 3.0f;
-					heightMap[getIndex(indices[2], indices[3])] += sediment / 3.0f;
-					heightMap[getIndex(indices[2], indices[3])] += sediment / 3.0f;
-					sediment = 0;
+					heightMap[getIndex(indices[0], indices[1])] += deposed_sediment / 3.0f;
+					heightMap[getIndex(indices[2], indices[3])] += deposed_sediment / 3.0f;
+					heightMap[getIndex(indices[4], indices[5])] += deposed_sediment / 3.0f;
+
 				}
 				else {
 					heightDiff = heightMap[getIndex(indices[6], indices[7])] - heightMap[getIndex(indices[4], indices[5])];
 					heightMap[getIndex(indices[0], indices[1])] += heightDiff;
 					heightMap[getIndex(indices[2], indices[3])] += heightDiff;
 					heightMap[getIndex(indices[4], indices[5])] += heightDiff;
-					sediment -= heightDiff * 3;
+					deposed_sediment -= heightDiff * 3;
+
+					if (deposed_sediment > 0) {
+						heightMap[getIndex(indices[0], indices[1])] += deposed_sediment / 4.0f;
+						heightMap[getIndex(indices[2], indices[3])] += deposed_sediment / 4.0f;
+						heightMap[getIndex(indices[4], indices[5])] += deposed_sediment / 4.0f;
+						heightMap[getIndex(indices[6], indices[7])] += deposed_sediment / 4.0f;
+					}
 				}
 			}
 		}
 	} else {
 
-		float totalHeight = 0.0f;
-		totalHeight += heightMap[getIndex(posX, posY)];
-		totalHeight += heightMap[getIndex(posX1, posY)];
-		totalHeight += heightMap[getIndex(posX, posY1)];
-		totalHeight += heightMap[getIndex(posX1, posY1)];
+		float d1 = max(0.0f, 1.41f - norm(pos[0] - posX, pos[1] - posY));
+		float d2 = max(0.0f, 1.41f - norm(pos[0] - posX1, pos[1] - posY));
+		float d3 = max(0.0f, 1.41f - norm(pos[0] - posX, pos[1] - posY1));
+		float d4 = max(0.0f, 1.41f - norm(pos[0] - posX1, pos[1] - posY1));
 
-		computeCapacity();
-		if (sediment > capacity) {
-			float deposed_sediment = (sediment - capacity) * p_deposition;
+		float totalWeight = d1 + d2 + d3 + d4;
 
-			heightMap[getIndex(posX, posY)] +=
-				deposed_sediment * heightMap[getIndex(posX, posY)] / totalHeight;
-			heightMap[getIndex(posX, posY1)] +=
-				deposed_sediment * heightMap[getIndex(posX, posY1)] / totalHeight;
-			heightMap[getIndex(posX1, posY)] +=
-				deposed_sediment * heightMap[getIndex(posX1, posY)] / totalHeight;
-			heightMap[getIndex(posX1, posY1)] +=
-				deposed_sediment * heightMap[getIndex(posX1, posY1)] / totalHeight;
+		float w1 = d1 / totalWeight;
+		float w2 = d2 / totalWeight;
+		float w3 = d3 / totalWeight;
+		float w4 = d4 / totalWeight;
 
-			sediment -= deposed_sediment;
-		}
-		else {
-			float eroded_sediment = min((capacity - sediment) * p_erosion, -terrain_height_diff) / 4.0f;
+		float eroded_sediment = min((capacity - sediment) * p_erosion, -terrain_height_diff);
 
-			heightMap[getIndex(std::floorf(pos[0]), std::floorf(pos[1]))] -= eroded_sediment;
-			heightMap[getIndex(std::floorf(pos[0]), std::ceilf(pos[1]))] -= eroded_sediment;
-			heightMap[getIndex(std::ceilf(pos[0]), std::floorf(pos[1]))] -= eroded_sediment;
-			heightMap[getIndex(std::ceilf(pos[0]), std::ceilf(pos[1]))] -= eroded_sediment;
+		heightMap[getIndex(posX, posY)] -= eroded_sediment * w1;
+		heightMap[getIndex(posX1, posY)] -= eroded_sediment * w2;
+		heightMap[getIndex(posX, posY1)] -= eroded_sediment * w3;
+		heightMap[getIndex(posX1, posY1)] -= eroded_sediment * w4;
 
-			sediment += eroded_sediment;
-		}
+		sediment += eroded_sediment;
 	}
 }
 

@@ -169,7 +169,7 @@ int main()
 			ImGui::SliderFloat("Presistence", &p, 0.0f, 2.0f);
 
 			if (ImGui::Button("Erosion")) {
-				int maxSteps = 100;
+				int maxSteps = 30;
 				for (int i = 0; i < 100000; i++) {
 					RainDrop drop(x, y, terrain.heightMap);
 					int step = 0;
