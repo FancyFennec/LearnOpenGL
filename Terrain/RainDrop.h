@@ -17,13 +17,13 @@ public:
 	std::vector<float> grad = { 0, 0 };
 	std::vector<float> dir = { 0, 0 };
 
-	float p_inertia = 0.5f;
-	float p_minSlope = 0.01f;
-	float p_capacity = 0.1f;
-	float p_deposition = 0.05f;
-	float p_erosion = 0.05f;
+	float p_inertia = 1.0f;
+	float p_minSlope = 0.1f;
+	float p_capacity = 1.0f;
+	float p_deposition = 0.3f;
+	float p_erosion = 0.01f;
 	float p_evaporation = 0.001f;
-	float p_gravity = 9.81f;
+	float p_gravity = 10.0f;
 
 	void setInertia(float inertia) { p_inertia = inertia; };
 	void setMinSlope(float minSlope) { p_minSlope = minSlope; };
@@ -49,6 +49,7 @@ private:
 	template <class T>
 	float max(T a, T b) { return a > b ? a : b; };
 	int getIndex(int i, int j) { return j * width + i; };
+	void sortIndices(std::vector<int>& indices);
 
 	void computeGradient();
 	void computeDirection();

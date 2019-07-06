@@ -169,23 +169,17 @@ int main()
 			ImGui::SliderFloat("Presistence", &p, 0.0f, 2.0f);
 
 			if (ImGui::Button("Erosion")) {
-				std::vector<RainDrop> drops = {};
-				drops.reserve(3000000);
-				for (int i = 0; i < 3000000; i++) {
-					drops.push_back(RainDrop(x, y, terrain.heightMap));
-				}
-
-				for (RainDrop drop : drops) {
-					int i = 0;
-					int maxSteps = 100;
-					while (drop.computeStep() && i < maxSteps) {
-						i++;
+				int maxSteps = 100;
+				for (int i = 0; i < 100000; i++) {
+					RainDrop drop(x, y, terrain.heightMap);
+					int step = 0;
+					while (drop.computeStep() && step < maxSteps) {
+						step++;
 					}
 				}
 
 				terrain.updateTerrain();
 				terrainMesh.UpdateMesh(terrain.vertices.data(), terrain.vertices.size() / 9);
-				drops.clear();
 			}
 
 			ImGui::End();
