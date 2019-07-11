@@ -7,8 +7,10 @@ class MarchingCube
 {
 public:
 	MarchingCube();
+	MarchingCube(const char *filename);
 	~MarchingCube();
 
+	std::vector<float> generateMRIMesh(int x, int y, int z);
 	std::vector<float> generatePerlinMesh(int x, int y, int z);
 	std::vector<float> generateMesh(std::vector<float> &field, int m, int n, int k);
 	std::vector<float> updateIsoLevel(float& isoLevel);
@@ -16,6 +18,7 @@ public:
 	std::vector<std::vector<float>> lookupMesh;
 
 private:
+	int initialiseData(const char* filename, std::vector<float> &values);
 	void generateMeshTable();
 	void generateTriangle(std::vector<float> &currentMesh, int* currentInt, int k);
 	void generateVertex(std::vector<float> & currentMesh, glm::vec3 &v, glm::vec3 &n, glm::vec3 &colour);
@@ -32,6 +35,20 @@ private:
 MarchingCube::MarchingCube()
 {
 	generateMeshTable();
+}
+
+// TODO: This does not yet work together
+inline MarchingCube::MarchingCube(const char* filename)
+{
+	valueField = {};
+
+	generateMeshTable();
+	if (!initialiseData(filename, valueField)) {
+		std::cout << "ERRROR!!! Could not load file :(" << std::endl;
+	}
+	else {
+		std::cout << "Vector size: " << valueField.size() << std::endl;
+	}
 }
 
 
@@ -58,6 +75,11 @@ inline void MarchingCube::generateMeshTable()
 
 		lookupMesh.push_back(currentMesh);
 	}
+}
+
+inline std::vector<float> MarchingCube::generateMRIMesh(int x, int y, int z)
+{
+	return  generateMesh(valueField, x, y, z);
 }
 
 inline std::vector<float> MarchingCube::generatePerlinMesh(int x, int y, int z)
@@ -93,7 +115,7 @@ inline std::vector<float> MarchingCube::generateMesh(std::vector<float> &field, 
 	this->n = n;
 	this->l = l;
 
-	float isoLevel = 0.65f;
+	float isoLevel = 50.0f;
 	std::vector<float> mesh = {};
 
 #pragma omp parallel for
@@ -212,4 +234,51 @@ inline void MarchingCube::generateVertex(std::vector<float> & currentMesh, glm::
 	currentMesh.push_back(colour.x);
 	currentMesh.push_back(colour.y);
 	currentMesh.push_back(colour.z);
+}
+
+inline int MarchingCube::initialiseData(const char* filename, std::vector<float> &values)
+{
+	std::ifstream myfile(filename);
+
+	if (!myfile) {
+		std::cout << "ERRROR!!! Could not load file :(" << std::endl;
+		return 0;
+	}
+	
+	auto getValue = [](char c) {return (float)c - 48; };
+	auto isNumeric = [](int x) {return (x >= 0 && x < 10); };
+
+	std::string line;
+	bool wasNumber = false;
+	int  x = 0;
+
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			for (char a : line) {
+				if (wasNumber) {
+					int newX = getValue(a);
+
+					if (isNumeric(newX)) {
+						x = x * 10 + newX;
+					}
+					else {
+						values.push_back((float)x);
+						wasNumber = false;
+					}
+				}
+				else {
+					x = getValue(a);
+					if (isNumeric(x)) {
+						wasNumber = true;
+					}
+				}
+			}
+
+		}
+		myfile.close();
+	}
+
+	return 1;
 }

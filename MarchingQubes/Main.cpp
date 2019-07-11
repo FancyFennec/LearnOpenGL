@@ -67,10 +67,9 @@ int main()
 	// set up vertex data (and buffer(s)) and configure vertex attributes
    // ------------------------------------------------------------------
 	
-	MarchingCube mc;
-	int x = 100, y = 100, z = 100;
-	
-	std::vector<float> mesh = mc.generatePerlinMesh(x, y, z);
+	MarchingCube mc("hires01.txt");
+	int x = 160, y = 192, z = 192;
+	 std::vector<float> mesh = mc.generateMRIMesh(x, y, z);
 
 	Mesh cubeMesh;
 	cubeMesh.CreateCubeMesh();
@@ -90,7 +89,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 lsmodel = glm::mat4(1.0f);
 
-	static float isoLevel = 0.65f;
+	static float isoLevel = 50.0f;
 	float oldIsoLevel = isoLevel;
 	// render loop
    // -----------
@@ -145,7 +144,7 @@ int main()
 		simpleModel.updateColourShader();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, -3));
-		model = glm::scale(model, glm::vec3(4 / ((float)x), 4 / ((float)y), 4 / ((float)z)));
+		model = glm::scale(model, glm::vec3(4 / ((float)x), 4 / ((float)x), 4 / ((float)x)));
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
@@ -158,7 +157,7 @@ int main()
 			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
+			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 100.0f);
 			//ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
