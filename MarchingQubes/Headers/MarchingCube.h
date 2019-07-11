@@ -79,7 +79,24 @@ inline void MarchingCube::generateMeshTable()
 
 inline std::vector<float> MarchingCube::generateMRIMesh(int x, int y, int z)
 {
-	return  generateMesh(valueField, x, y, z);
+	std::vector<float> gridValues = {};
+
+#pragma omp parallel for
+	for (int i = -1; i < x + 1; ++i) {
+		for (int j = -1; j < y + 1; ++j) {
+			for (int k = -1; k < z + 1; ++k) {
+				if (i == -1 || j == -1 || k == -1 || i == x || j == y || k == z) {
+					gridValues.push_back(0);
+				}
+				else {
+					gridValues.push_back(valueField[getIndex(i, j, k, x, y)]);
+				}
+
+			}
+		}
+	}
+
+	return  generateMesh(gridValues, x + 2, y + 2, z + 2);
 }
 
 inline std::vector<float> MarchingCube::generatePerlinMesh(int x, int y, int z)
@@ -115,7 +132,7 @@ inline std::vector<float> MarchingCube::generateMesh(std::vector<float> &field, 
 	this->n = n;
 	this->l = l;
 
-	float isoLevel = 50.0f;
+	float isoLevel = 30.0f;
 	std::vector<float> mesh = {};
 
 #pragma omp parallel for

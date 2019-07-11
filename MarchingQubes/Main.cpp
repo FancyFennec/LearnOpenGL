@@ -68,7 +68,7 @@ int main()
    // ------------------------------------------------------------------
 	
 	MarchingCube mc("hires01.txt");
-	int x = 160, y = 192, z = 192;
+	int x = 192, y = 192, z = 192;
 	 std::vector<float> mesh = mc.generateMRIMesh(x, y, z);
 
 	Mesh cubeMesh;
