@@ -132,7 +132,7 @@ inline std::vector<float> MarchingCube::generateMesh(std::vector<float> &field, 
 	this->n = n;
 	this->l = l;
 
-	float isoLevel = 30.0f;
+	float isoLevel = 60.0f;
 	std::vector<float> mesh = {};
 
 #pragma omp parallel for

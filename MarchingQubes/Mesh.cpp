@@ -9,6 +9,8 @@ Mesh::Mesh()
 
 void Mesh::CreateMesh(float *vertices, unsigned int numOfVertices)
 {
+	ClearMesh();
+
 	this->numOfVertices = numOfVertices;
 
 	glGenVertexArrays(1, &VAO);

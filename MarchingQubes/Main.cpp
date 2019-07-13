@@ -157,7 +157,7 @@ int main()
 			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			ImGui::SliderFloat("Iso Level", &isoLevel, 0.0f, 100.0f);
+			ImGui::SliderFloat("Iso Level", &isoLevel, 60.0f, 250.0f);
 			//ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();
