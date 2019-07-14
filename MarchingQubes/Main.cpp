@@ -89,8 +89,10 @@ int main()
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 lsmodel = glm::mat4(1.0f);
 
-	static float isoLevel = 50.0f;
-	float oldIsoLevel = isoLevel;
+	static float isoLevelBot = 50.0f;
+	static float isoLevelTop = 255.0f;
+	float oldIsoLevelBot = isoLevelBot;
+	float oldIsoLevelTop = isoLevelBot;
 	// render loop
    // -----------
 	while (!window.getShouldClose())
@@ -132,9 +134,9 @@ int main()
 		lampModel.shader.useMVP(lsmodel, view, projection);
 		lampModel.renderModel();
 
-		if (oldIsoLevel != isoLevel) {
-			mesh = mc.updateIsoLevel(isoLevel);
-			perlinMesh.CreateMesh(mesh.data(), mesh.size() / 9);
+		if (oldIsoLevelBot != isoLevelBot || oldIsoLevelTop != isoLevelTop) {
+			mesh = mc.updateIsoLevel(isoLevelBot, isoLevelTop);
+			perlinMesh.UpdateMesh(mesh.data(), mesh.size() / 9);
 		}
 
 		//Draw simple cube
@@ -148,7 +150,8 @@ int main()
 		simpleModel.shader.setMat4("model", model);
 		simpleModel.renderModel();
 
-		oldIsoLevel = isoLevel;
+		oldIsoLevelBot = isoLevelBot;
+		oldIsoLevelTop = isoLevelTop;
 		//Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 		{
 
@@ -157,7 +160,9 @@ int main()
 			//ImGui::SliderFloat("Diffuse", &d, 0.0f, 1.0f);
 			//ImGui::SliderFloat("Specular", &s, 0.0f, 1.0f);
 
-			ImGui::SliderFloat("Iso Level", &isoLevel, 60.0f, 250.0f);
+			
+			//ImGui::SliderFloat("Iso Level", &isoLevelBot, 60.0f, 250.0f);
+			ImGui::DragFloatRange2("Iso Level", &isoLevelBot, &isoLevelTop,1, 0.0f, 250.0f);
 			//ImGui::InputFloat("Iso Level", &isoLevel, 0.0f, 1.0f);
 
 			ImGui::End();

@@ -28,8 +28,18 @@ void Mesh::CreateMesh(float *vertices, unsigned int numOfVertices)
 	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	glBindVertexArray(0);
+}
+
+void Mesh::UpdateMesh(float * vertices, unsigned int numOfVertices)
+{
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * 9 * numOfVertices, vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 

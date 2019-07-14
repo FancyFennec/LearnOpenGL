@@ -14,6 +14,7 @@ public:
 	std::vector<float> generatePerlinMesh(int x, int y, int z);
 	std::vector<float> generateMesh(std::vector<float> &field, int m, int n, int k);
 	std::vector<float> updateIsoLevel(float& isoLevel);
+	std::vector<float> updateIsoLevel(float& isoLevel, float& isoLevelTop);
 
 	std::vector<std::vector<float>> lookupMesh;
 
@@ -195,6 +196,67 @@ inline std::vector<float> MarchingCube::updateIsoLevel(float& isoLevel)
 				lookUpindex |= valueField[getIndex(i + 1, j + 1, k, m, n)] > isoLevel ? 1 << 5 : 0 << 5;
 				lookUpindex |= valueField[getIndex(i + 1, j, k, m, n)] > isoLevel ? 1 << 6 : 0 << 6;
 				lookUpindex |= valueField[getIndex(i, j, k, m, n)] > isoLevel ? 1 << 7 : 0 << 7;
+
+				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
+
+					mesh.push_back(lookupMesh[lookUpindex].data()[x] + i);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 1] - k);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 2] - j);
+
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 3]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 4]);
+					mesh.push_back(lookupMesh[lookUpindex].data()[x + 5]);
+
+					mesh.push_back(
+						(float)k / float(l) *lookupMesh[lookUpindex].data()[x + 6]
+						+ (1 - (float)k / float(l)));
+					mesh.push_back((float)k / float(l) *lookupMesh[lookUpindex].data()[x + 7]
+						+ (1 - (float)k / float(l)));
+					mesh.push_back((float)k / float(l) *lookupMesh[lookUpindex].data()[x + 8]
+						+ (1 - (float)k / float(l)));
+				}
+			}
+		}
+	}
+
+	return mesh;
+}
+
+inline std::vector<float> MarchingCube::updateIsoLevel(float& isoLevel, float& isoLevelTop)
+{
+	std::vector<float> mesh = {};
+
+#pragma omp parallel for
+	for (int k = 0; k < l - 1; k++) {
+		for (int j = 0; j < n - 1; j++) {
+			for (int i = 0; i < m - 1; i++) {
+				int lookUpindex = 0;
+
+				lookUpindex |= valueField[getIndex(i, j + 1, k + 1, m, n)] > isoLevel &&
+					valueField[getIndex(i, j + 1, k + 1, m, n)] <= isoLevelTop
+					? 1 << 0 : 0 << 0;
+				lookUpindex |= valueField[getIndex(i + 1, j + 1, k + 1, m, n)] > isoLevel &&
+					valueField[getIndex(i + 1, j + 1, k + 1, m, n)] <= isoLevelTop
+					? 1 << 1 : 0 << 1;
+				lookUpindex |= valueField[getIndex(i + 1, j, k + 1, m, n)] > isoLevel &&
+					valueField[getIndex(i + 1, j, k + 1, m, n)] <= isoLevelTop
+					? 1 << 2 : 0 << 2;
+				lookUpindex |= valueField[getIndex(i, j, k + 1, m, n)] > isoLevel &&
+					valueField[getIndex(i, j, k + 1, m, n)] <=isoLevelTop
+					? 1 << 3 : 0 << 3;
+
+				lookUpindex |= valueField[getIndex(i, j + 1, k, m, n)] > isoLevel &&
+					valueField[getIndex(i, j + 1, k, m, n)] <= isoLevelTop
+					? 1 << 4 : 0 << 4;
+				lookUpindex |= valueField[getIndex(i + 1, j + 1, k, m, n)] > isoLevel &&
+					valueField[getIndex(i + 1, j + 1, k, m, n)] <= isoLevelTop
+					? 1 << 5 : 0 << 5;
+				lookUpindex |= valueField[getIndex(i + 1, j, k, m, n)] > isoLevel &&
+					valueField[getIndex(i + 1, j, k, m, n)] <= isoLevelTop
+					? 1 << 6 : 0 << 6;
+				lookUpindex |= valueField[getIndex(i, j, k, m, n)] > isoLevel &&
+					valueField[getIndex(i, j, k, m, n)]  <= isoLevelTop
+					? 1 << 7 : 0 << 7;
 
 				for (int x = 0; x < lookupMesh[lookUpindex].size(); x += 9) {
 
